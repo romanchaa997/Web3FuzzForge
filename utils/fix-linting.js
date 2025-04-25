@@ -11,13 +11,7 @@ const { execSync } = require('child_process')
 const chalk = require('chalk')
 
 // Directories to process
-const DIRECTORIES = [
-  'tests',
-  'utils',
-  'src',
-  'web3fuzzforge-community-tests',
-  'autotests'
-]
+const DIRECTORIES = ['tests', 'utils', 'src', 'web3fuzzforge-community-tests', 'autotests']
 
 // Get all JavaScript and TypeScript files
 function getFiles(dir) {
@@ -61,12 +55,20 @@ function fixCommonIssues() {
           let modified = false
 
           // Fix 1: Fix "no-unused-vars" by adding eslint-disable-next-line
-          if (content.includes('WALLET_NAME') || content.includes('NETWORK_NAME') || content.includes('WALLET_ADDRESS')) {
+          if (
+            content.includes('WALLET_NAME') ||
+            content.includes('NETWORK_NAME') ||
+            content.includes('WALLET_ADDRESS')
+          ) {
             const lines = content.split('\n')
             for (let i = 0; i < lines.length; i++) {
-              if ((lines[i].includes('WALLET_NAME') || lines[i].includes('NETWORK_NAME') || lines[i].includes('WALLET_ADDRESS')) &&
-                  lines[i].includes('const') &&
-                  !lines[i - 1]?.includes('eslint-disable-next-line')) {
+              if (
+                (lines[i].includes('WALLET_NAME') ||
+                  lines[i].includes('NETWORK_NAME') ||
+                  lines[i].includes('WALLET_ADDRESS')) &&
+                lines[i].includes('const') &&
+                !lines[i - 1]?.includes('eslint-disable-next-line')
+              ) {
                 lines.splice(i, 0, '// eslint-disable-next-line no-unused-vars')
                 modified = true
               }
@@ -77,7 +79,10 @@ function fixCommonIssues() {
           // Fix 2: Fix TypeScript "no-explicit-any" by updating imports for TypeScript files
           if (file.endsWith('.ts') && !content.includes('import { EthereumProvider }')) {
             // Check if we should add the import
-            if (content.includes('interface Window') || content.includes('interface EthereumProvider')) {
+            if (
+              content.includes('interface Window') ||
+              content.includes('interface EthereumProvider')
+            ) {
               const lines = content.split('\n')
               let importInserted = false
 
@@ -133,4 +138,8 @@ function fixCommonIssues() {
 console.log(chalk.blue('==== Web3 Security Test Kit - Lint Fixer ===='))
 fixCommonIssues()
 console.log(chalk.green('Done! Most common ESLint issues should now be fixed.'))
-console.log(chalk.yellow('Note: Some issues may require manual fixing. Check remaining linting errors with "npm run lint".'))
+console.log(
+  chalk.yellow(
+    'Note: Some issues may require manual fixing. Check remaining linting errors with "npm run lint".'
+  )
+)

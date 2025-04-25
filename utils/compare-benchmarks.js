@@ -56,7 +56,7 @@ function parseArguments() {
   const args = {
     current: null,
     previous: null,
-    output: null
+    output: null,
   }
 
   for (let i = 0; i < process.argv.length; i++) {
@@ -74,7 +74,9 @@ function parseArguments() {
   // Validate required arguments
   if (!args.current || !args.previous) {
     console.error('Missing required arguments. Usage:')
-    console.error('  node compare-benchmarks.js --current <current-results.json> --previous <previous-results.json> [--output <output-file.md>]')
+    console.error(
+      '  node compare-benchmarks.js --current <current-results.json> --previous <previous-results.json> [--output <output-file.md>]'
+    )
     process.exit(1)
   }
 
@@ -89,9 +91,10 @@ function generateComparisonReport(current, previous) {
   // Calculate differences
   const totalDurationDiff = currentMetrics.totalDuration - previousMetrics.totalDuration
   const averageDurationDiff = currentMetrics.averageDuration - previousMetrics.averageDuration
-  const percentageDurationChange = previousMetrics.averageDuration > 0
-    ? ((averageDurationDiff / previousMetrics.averageDuration) * 100).toFixed(2)
-    : 0
+  const percentageDurationChange =
+    previousMetrics.averageDuration > 0
+      ? ((averageDurationDiff / previousMetrics.averageDuration) * 100).toFixed(2)
+      : 0
 
   const isPerformanceImproved = averageDurationDiff < 0
 
@@ -120,7 +123,9 @@ function generateComparisonReport(current, previous) {
   }
 
   // Test comparison details
-  const testComparisonData = compareTestDurations(currentMetrics.testDurations, previousMetrics.testDurations)
+  const testComparisonData = compareTestDurations(
+    currentMetrics.testDurations, previousMetrics.testDurations
+  )
 
   // Add improved tests section
   if (testComparisonData.improved.length > 0) {
@@ -172,7 +177,7 @@ function compareTestDurations(current, previous) {
     regressed: [],
     unchanged: [],
     new: [],
-    removed: []
+    removed: [],
   }
 
   // Find improved, regressed, and unchanged tests
@@ -180,16 +185,14 @@ function compareTestDurations(current, previous) {
     if (testName in previous) {
       const previousDuration = previous[testName]
       const diff = currentDuration - previousDuration
-      const percentChange = previousDuration > 0
-        ? (diff / previousDuration) * 100
-        : 0
+      const percentChange = previousDuration > 0 ? (diff / previousDuration) * 100 : 0
 
       const comparison = {
         name: testName,
         currentDuration,
         previousDuration,
         diff,
-        percentChange
+        percentChange,
       }
 
       if (diff < 0) {
@@ -201,7 +204,7 @@ function compareTestDurations(current, previous) {
       }
     } else {
       result.new.push({
-        name: testName, duration: currentDuration
+        name: testName, duration: currentDuration,
       })
     }
   }
@@ -210,7 +213,7 @@ function compareTestDurations(current, previous) {
   for (const testName of Object.keys(previous)) {
     if (!(testName in current)) {
       result.removed.push({
-        name: testName, duration: previous[testName]
+        name: testName, duration: previous[testName],
       })
     }
   }

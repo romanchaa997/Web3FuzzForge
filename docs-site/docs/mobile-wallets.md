@@ -32,29 +32,29 @@ Testing mobile wallets presents unique challenges:
 test('WalletConnect mobile wallet connection', async ({ page }) => {
   // Navigate to your dApp
   await page.goto('https://your-dapp.com');
-  
+
   // Click connect button to trigger WalletConnect
   await page.click('#connect-wallet');
-  
+
   // Get WalletConnect QR code or URI
   const wcUri = await page.evaluate(() => {
     return document.querySelector('[data-testid="wc-uri"]').textContent;
   });
-  
+
   // In a full mobile automation test, you would:
   // 1. Launch mobile wallet app on emulator or real device
   // 2. Send the wcUri to the mobile device
   // 3. Open the URI in the wallet app
   // 4. Approve the connection request in the wallet
-  
+
   // Wait for connection to complete
   await page.waitForSelector('[data-testid="wallet-connected"]');
-  
+
   // Verify the connection was successful
   const isConnected = await page.evaluate(() => {
     return window.ethereum.isConnected();
   });
-  
+
   expect(isConnected).toBeTruthy();
 });
 ```
@@ -70,13 +70,13 @@ const { test } = require('@playwright/test');
 test('Test with mobile wallet using Appium', async ({ page }) => {
   // Start browser test with Playwright
   await page.goto('https://your-dapp.com');
-  
+
   // Get WalletConnect URI
   await page.click('#connect-wallet');
   const wcUri = await page.evaluate(() => {
     return document.querySelector('[data-testid="wc-uri"]').textContent;
   });
-  
+
   // Initialize Appium client for mobile device
   const mobileClient = await remote({
     capabilities: {
@@ -84,21 +84,21 @@ test('Test with mobile wallet using Appium', async ({ page }) => {
       'appium:deviceName': 'Android Emulator',
       'appium:app': '/path/to/wallet-app.apk',
       // Other Appium capabilities...
-    }
+    },
   });
-  
+
   // Use the mobile client to open the wallet app
   await mobileClient.$('//android.widget.Button[@text="Scan"]').click();
-  
+
   // Send the WalletConnect URI to the device
   // This step varies depending on your setup
-  
+
   // Approve the connection in the wallet app
   await mobileClient.$('//android.widget.Button[@text="Connect"]').click();
-  
+
   // Return to the browser test to verify connection
   await page.waitForSelector('[data-testid="wallet-connected"]');
-  
+
   // Clean up the mobile session
   await mobileClient.deleteSession();
 });
@@ -112,21 +112,21 @@ For testing deep links with mobile wallets:
 test('Test wallet deep links', async ({ page, context }) => {
   // Start your dApp
   await page.goto('https://your-dapp.com');
-  
+
   // Set up listener for new pages (deep links often open new tabs)
   const pagePromise = context.waitForEvent('page');
-  
+
   // Click connect button that triggers deep link
   await page.click('#connect-with-deep-link');
-  
+
   // Handle the new page or redirect
   const newPage = await pagePromise;
   await newPage.waitForLoadState();
-  
+
   // Check if the deep link has the correct format
   const url = newPage.url();
   expect(url).toMatch(/metamask:\/\/|phantom:\/\/|coinbase-wallet:\/\//);
-  
+
   // In a real test with a mobile device, you'd then:
   // 1. Intercept the deep link
   // 2. Open it on the mobile device
@@ -154,4 +154,4 @@ We encourage community contributions of mobile wallet testing examples. To contr
 3. Document any required plugins or extensions
 4. Submit a pull request with your example
 
-Join our efforts to expand mobile wallet testing coverage and make the Web3 ecosystem more secure on all platforms! 
+Join our efforts to expand mobile wallet testing coverage and make the Web3 ecosystem more secure on all platforms!

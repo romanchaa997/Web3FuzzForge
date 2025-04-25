@@ -21,6 +21,7 @@ Testing with real wallets provides several benefits:
 ### 1. Controlled Test Wallets
 
 Create dedicated test wallets with:
+
 - Minimal funds on test networks
 - No access to production assets
 - Clear separation from development wallets
@@ -29,16 +30,16 @@ Create dedicated test wallets with:
 test('Test with actual MetaMask wallet', async ({ page, context }) => {
   // Launch browser with MetaMask extension installed
   // Extension path needs to be configured in playwright.config.js
-  
+
   // Navigate to your MetaMask setup page
   await page.goto('chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/home.html');
-  
+
   // Import test wallet using seed phrase
   await page.fill('#seed-phrase', 'your test wallet seed phrase');
-  
+
   // Set test wallet password
   await page.fill('#password', 'your-secure-test-password');
-  
+
   // Continue with test...
 });
 ```
@@ -46,6 +47,7 @@ test('Test with actual MetaMask wallet', async ({ page, context }) => {
 ### 2. Sandboxed Environment
 
 Set up an isolated testing environment:
+
 - Docker containers with browser + wallet extensions
 - Virtual machines with controlled network access
 - CI/CD pipeline with ephemeral wallets
@@ -53,6 +55,7 @@ Set up an isolated testing environment:
 ### 3. Hybrid Testing Approach
 
 Combine real and mocked wallet testing:
+
 - Use mocks for fast unit and integration tests
 - Use real wallets for key security verification tests
 - Use real wallets for final acceptance tests
@@ -82,15 +85,15 @@ const config = {
 test('Test with real WalletConnect', async ({ page }) => {
   // Navigate to your dApp
   await page.goto('https://your-dapp.com');
-  
+
   // Click connect button to trigger WalletConnect
   await page.click('#connect-wallet');
-  
-  // Get WalletConnect QR code 
+
+  // Get WalletConnect QR code
   const qrCodeData = await page.evaluate(() => {
     return document.querySelector('.walletconnect-qrcode').getAttribute('data-qrcode');
   });
-  
+
   // In a real test, you'd use a QR code scanner or direct URI handling
   // For testing purposes, you can use a mobile device automation tool
   // to scan this QR and confirm the connection
@@ -120,4 +123,4 @@ We're working on the following improvements for real wallet testing:
 
 ## Community Examples
 
-Check out our [community-test-examples](community-test-examples) section for contributed examples of real wallet testing setups from the Web3FuzzForge community. 
+Check out our [community-test-examples](community-test-examples) section for contributed examples of real wallet testing setups from the Web3FuzzForge community.

@@ -106,4 +106,4 @@ web3fuzzforge run --mock-mode --grep="MetaMask"
 
 - **Selector Errors**: If tests can't find elements, ensure the selectors in your tests match those in your dApp.
 
-- **Mock dApp Port Conflict**: If port 3000 is already in use, modify the port in `mocked-sample-app/vite.config.ts`. 
+- **Mock dApp Port Conflict**: If port 3000 is already in use, modify the port in `mocked-sample-app/vite.config.ts`.

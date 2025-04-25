@@ -20,14 +20,8 @@ module.exports = defineConfig({
   workers: process.env.CI ? 1 : undefined,
   // Reporter to use
   reporter: process.env.CI
-    ? [
-        ['html', { outputFolder: '../reports', open: 'never' }],
-        ['list']
-      ]
-    : [
-        ['html', { outputFolder: '../reports', open: 'on-failure' }],
-        ['list']
-      ],
+    ? [['html', { outputFolder: '../reports', open: 'never' }], ['list']]
+    : [['html', { outputFolder: '../reports', open: 'on-failure' }], ['list']],
 
   use: {
     // Base URL to use in actions like `await page.goto('/')`

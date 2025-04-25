@@ -1,97 +1,62 @@
-import React from 'react'
-import clsx from 'clsx'
-import Layout from '@theme/Layout'
-import Link from '@docusaurus/Link'
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
-import useBaseUrl from '@docusaurus/useBaseUrl'
-import styles from './styles.module.css'
+import React from 'react';
+import clsx from 'clsx';
+import Layout from '@theme/Layout';
+import Link from '@docusaurus/Link';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import styles from './index.module.css';
 
-const features = [
-  {
-    title: 'Multi-Wallet Testing',
-    imageUrl: 'img/wallets.svg',
-    description: (
-      <>
-        Test MetaMask, WalletConnect, Coinbase Wallet, Phantom, and more
-        with a unified testing interface that makes cross-wallet testing simple.
-      </>
-    ),
-  },
-  {
-    title: 'Security-First',
-    imageUrl: 'img/security.svg',
-    description: (
-      <>
-        Generate test templates for common Web3 security vulnerabilities
-        to find and fix issues before attackers can exploit them.
-      </>
-    ),
-  },
-  {
-    title: 'Automated Test Generation',
-    imageUrl: 'img/automation.svg',
-    description: (
-      <>
-        Generate comprehensive test templates with a single command or
-        use AI-driven configuration to describe tests in natural language.
-      </>
-    ),
-  },
-]
-
-function Feature({ imageUrl, title, description }) {
-  const imgUrl = useBaseUrl(imageUrl)
+function HomepageHeader() {
+  const {siteConfig} = useDocusaurusContext();
   return (
-    <div className={clsx('col col--4', styles.feature)}>
-      {imgUrl && (
-        <div className="text--center">
-          <img className={styles.featureImage} src={imgUrl} alt={title} />
+    <header className={clsx('hero hero--primary', styles.heroBanner)}>
+      <div className="container">
+        <h1 className="hero__title">{siteConfig.title}</h1>
+        <p className="hero__subtitle">{siteConfig.tagline}</p>
+        <div className={styles.buttons}>
+          <Link
+            className="button button--secondary button--lg"
+            to="/docs/overview">
+            Get Started in 5 Minutes →
+          </Link>
         </div>
-      )}
-      <h3>{title}</h3>
-      <p>{description}</p>
-    </div>
-  )
+      </div>
+    </header>
+  );
 }
 
-function Home() {
-  const context = useDocusaurusContext()
-  const { siteConfig = {} } = context
+export default function Home() {
+  const {siteConfig} = useDocusaurusContext();
   return (
     <Layout
-      title={`${siteConfig.title}`}
-      description="Automated test scaffolding for Web3 developers">
-      <header className={clsx('hero hero--primary', styles.heroBanner)}>
-        <div className="container">
-          <h1 className="hero__title">{siteConfig.title}</h1>
-          <p className="hero__subtitle">{siteConfig.tagline}</p>
-          <div className={styles.buttons}>
-            <Link
-              className={clsx(
-                'button button--outline button--secondary button--lg',
-                styles.getStarted,
-              )}
-              to={useBaseUrl('docs/intro')}>
-              Get Started
-            </Link>
-          </div>
-        </div>
-      </header>
+      title={`${siteConfig.title} Documentation`}
+      description="Comprehensive testing toolkit for Web3 dApps">
+      <HomepageHeader />
       <main>
-        {features && features.length > 0 && (
-          <section className={styles.features}>
-            <div className="container">
-              <div className="row">
-                {features.map((props, idx) => (
-                  <Feature key={idx} {...props} />
-                ))}
+        <section className={styles.features}>
+          <div className="container">
+            <div className="row">
+              <div className="col col--4">
+                <div className="text--center padding-horiz--md">
+                  <h3>Wallet Testing</h3>
+                  <p>Test connections with MetaMask, Coinbase, Phantom, and more</p>
+                </div>
+              </div>
+              <div className="col col--4">
+                <div className="text--center padding-horiz--md">
+                  <h3>Security Focus</h3>
+                  <p>Fuzzing tools to identify common Web3 security vulnerabilities</p>
+                </div>
+              </div>
+              <div className="col col--4">
+                <div className="text--center padding-horiz--md">
+                  <h3>Cross-Chain Support</h3>
+                  <p>Test your dApp across multiple EVM and non-EVM chains</p>
+                </div>
               </div>
             </div>
-          </section>
-        )}
+          </div>
+        </section>
       </main>
     </Layout>
-  )
+  );
 }
-
-export default Home

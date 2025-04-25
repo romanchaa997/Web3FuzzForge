@@ -10,7 +10,8 @@ const path = require('path')
 
 // Configuration
 const BENCHMARK_RESULTS_DIR = path.join(process.cwd(), 'benchmark-results')
-const JSON_RESULTS_PATH = process.env.PLAYWRIGHT_JSON_OUTPUT_NAME || path.join(BENCHMARK_RESULTS_DIR, 'results.json')
+const JSON_RESULTS_PATH =
+  process.env.PLAYWRIGHT_JSON_OUTPUT_NAME || path.join(BENCHMARK_RESULTS_DIR, 'results.json')
 const PREVIOUS_RESULTS_PATH = path.join(BENCHMARK_RESULTS_DIR, 'previous.json')
 const OUTPUT_PATH = path.join(BENCHMARK_RESULTS_DIR, 'metrics.json')
 
@@ -54,7 +55,7 @@ async function analyzeBenchmarks() {
     const output = {
       timestamp: new Date().toISOString(),
       metrics,
-      comparison
+      comparison,
     }
 
     fs.writeFileSync(OUTPUT_PATH, JSON.stringify(output, null, 2))
@@ -84,7 +85,7 @@ function extractTestMetrics(results) {
     averageDuration: 0,
     testDurations: {},
     slowestTests: [],
-    fastestTests: []
+    fastestTests: [],
   }
 
   // Process test results
@@ -98,8 +99,9 @@ function extractTestMetrics(results) {
   }
 
   // Find slowest and fastest tests
-  const testDurations = Object.entries(metrics.testDurations)
-    .map(([name, duration]) => ({ name, duration }))
+  const testDurations = Object.entries(metrics.testDurations).map(([name, duration]) => ({
+    name, duration,
+  }))
 
   // Sort by duration (descending for slowest)
   testDurations.sort((a, b) => b.duration - a.duration)
@@ -169,7 +171,7 @@ function compareWithPrevious(current, previous) {
     totalDurationDiff: current.totalDuration - previous.totalDuration,
     averageDurationDiff: current.averageDuration - previous.averageDuration,
     percentageDurationChange: 0,
-    testComparisons: []
+    testComparisons: [],
   }
 
   // Calculate percentage change in average duration
@@ -194,13 +196,15 @@ function compareWithPrevious(current, previous) {
         currentDuration,
         previousDuration,
         durationDiff,
-        percentageChange
+        percentageChange,
       })
     }
   }
 
   // Sort by percentage change (largest change first)
-  comparison.testComparisons.sort((a, b) => Math.abs(b.percentageChange) - Math.abs(a.percentageChange))
+  comparison.testComparisons.sort(
+    (a, b) => Math.abs(b.percentageChange) - Math.abs(a.percentageChange)
+  )
 
   return comparison
 }
@@ -209,7 +213,9 @@ function compareWithPrevious(current, previous) {
 function printSummary(metrics) {
   console.log('\n===== PERFORMANCE BENCHMARK SUMMARY =====')
   console.log(`Total Tests: ${metrics.totalTests}`)
-  console.log(`Passed: ${metrics.passedTests} | Failed: ${metrics.failedTests} | Skipped: ${metrics.skippedTests}`)
+  console.log(
+    `Passed: ${metrics.passedTests} | Failed: ${metrics.failedTests} | Skipped: ${metrics.skippedTests}`
+  )
   console.log(`Total Duration: ${formatDuration(metrics.totalDuration)}`)
   console.log(`Average Test Duration: ${formatDuration(metrics.averageDuration)}`)
 
@@ -231,13 +237,17 @@ function printComparisonSummary(comparison) {
   const durationChangeDirection = comparison.averageDurationDiff < 0 ? 'faster' : 'slower'
   const durationChangeEmoji = comparison.averageDurationDiff < 0 ? '🚀' : '⚠️'
 
-  console.log(`Average Duration Change: ${formatDuration(Math.abs(comparison.averageDurationDiff))} ${durationChangeDirection} ${durationChangeEmoji}`)
+  console.log(
+    `Average Duration Change: ${formatDuration(Math.abs(comparison.averageDurationDiff))} ${durationChangeDirection} ${durationChangeEmoji}`
+  )
   console.log(`Percentage Change: ${comparison.percentageDurationChange.toFixed(2)}%`)
 
   console.log('\n----- TESTS WITH LARGEST CHANGES -----')
   comparison.testComparisons.slice(0, 5).forEach((test, index) => {
     const changeDirection = test.durationDiff < 0 ? 'faster' : 'slower'
-    console.log(`${index + 1}. ${test.testName} - ${formatDuration(Math.abs(test.durationDiff))} ${changeDirection} (${test.percentageChange.toFixed(2)}%)`)
+    console.log(
+      `${index + 1}. ${test.testName} - ${formatDuration(Math.abs(test.durationDiff))} ${changeDirection} (${test.percentageChange.toFixed(2)}%)`
+    )
   })
 }
 

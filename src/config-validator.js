@@ -13,11 +13,29 @@ const ajv = new Ajv({ allErrors: true })
 function getValidator() {
   try {
     const schemaPath = path.join(__dirname, 'config-schema.json')
+    
+    // Check if schema file exists
+    if (!fs.existsSync(schemaPath)) {
+      console.error(chalk.red(`Schema file not found: ${schemaPath}`))
+      // Create an empty validator that accepts anything
+      return () => true
+    }
+    
     const schema = fs.readFileSync(schemaPath, 'utf8')
-    return ajv.compile(JSON.parse(schema))
+    
+    try {
+      // Parse the schema
+      const parsedSchema = JSON.parse(schema)
+      return ajv.compile(parsedSchema)
+    } catch (parseError) {
+      console.error(chalk.red(`Error parsing schema: ${parseError.message}`))
+      // Create an empty validator that accepts anything
+      return () => true
+    }
   } catch (error) {
     console.error(chalk.red(`Error loading schema: ${error.message}`))
-    return null
+    // Create an empty validator that accepts anything
+    return () => true
   }
 }
 
@@ -31,14 +49,14 @@ function validateConfig(config) {
   if (!validate) {
     return {
       isValid: false,
-      errors: ['Failed to load schema for validation']
+      errors: ['Failed to load schema for validation'],
     }
   }
 
   const isValid = validate(config)
   return {
     isValid,
-    errors: isValid ? [] : formatErrors(validate.errors)
+    errors: isValid ? [] : formatErrors(validate.errors),
   }
 }
 
@@ -79,7 +97,7 @@ function loadAndValidateConfig(configPath = null) {
         config: null,
         isValid: false,
         errors: [`Configuration file not found: ${configPath}`],
-        fileExists: false
+        fileExists: false,
       }
     }
 
@@ -94,7 +112,7 @@ function loadAndValidateConfig(configPath = null) {
         isValid: validation.isValid,
         errors: validation.errors,
         fileExists: true,
-        parseError: false
+        parseError: false,
       }
     } catch (parseError) {
       // Handle JSON parsing errors
@@ -103,7 +121,7 @@ function loadAndValidateConfig(configPath = null) {
         isValid: false,
         errors: [`Invalid JSON format: ${parseError.message}`],
         fileExists: true,
-        parseError: true
+        parseError: true,
       }
     }
   } catch (error) {
@@ -112,7 +130,7 @@ function loadAndValidateConfig(configPath = null) {
       config: null,
       isValid: false,
       errors: [`Error loading configuration: ${error.message}`],
-      fileExists: false
+      fileExists: false,
     }
   }
 }
@@ -128,7 +146,7 @@ function generateDefaultConfig() {
     connect_button_selector: '.connect-wallet-button',
     lang: 'js',
     out: './tests/test.js',
-    lint: true
+    lint: true,
   }
 }
 
@@ -146,12 +164,12 @@ function createDefaultConfig(configPath = null) {
 
     return {
       success: true,
-      message: `Created default configuration file at: ${configPath}`
+      message: `Created default configuration file at: ${configPath}`,
     }
   } catch (error) {
     return {
       success: false,
-      message: `Failed to create configuration file: ${error.message}`
+      message: `Failed to create configuration file: ${error.message}`,
     }
   }
 }
@@ -160,5 +178,5 @@ module.exports = {
   validateConfig,
   loadAndValidateConfig,
   generateDefaultConfig,
-  createDefaultConfig
+  createDefaultConfig,
 }

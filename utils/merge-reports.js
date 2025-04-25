@@ -62,7 +62,7 @@ function collectAndLinkArtifacts(reportsDir, testResultsDir, dataDir) {
     const artifactIndex = {
       screenshots: [],
       fuzzedInputs: [],
-      traces: []
+      traces: [],
     }
 
     // Find all artifacts in test-output directory
@@ -85,7 +85,9 @@ function collectAndLinkArtifacts(reportsDir, testResultsDir, dataDir) {
     // Inject artifact links into the HTML report
     injectArtifactLinks(reportsDir, artifactIndex)
 
-    console.log(`Artifacts indexed: ${artifactIndex.screenshots.length} screenshots, ${artifactIndex.fuzzedInputs.length} fuzzed inputs, ${artifactIndex.traces.length} traces`)
+    console.log(
+      `Artifacts indexed: ${artifactIndex.screenshots.length} screenshots, ${artifactIndex.fuzzedInputs.length} fuzzed inputs, ${artifactIndex.traces.length} traces`
+    )
   } catch (error) {
     console.error('Error collecting artifacts:', error.message)
   }
@@ -110,27 +112,29 @@ function walkDirForArtifacts(dir, artifactIndex) {
         artifactIndex.screenshots.push({
           path: relPath,
           name: file.name,
-          time: fs.statSync(fullPath).mtime
+          time: fs.statSync(fullPath).mtime,
         })
 
         // Check for fuzzing inputs in filename
-        if (file.name.includes('xss-test') ||
-            file.name.includes('large-amount') ||
-            file.name.includes('fuzz')) {
+        if (
+          file.name.includes('xss-test') ||
+          file.name.includes('large-amount') ||
+          file.name.includes('fuzz')
+        ) {
           artifactIndex.fuzzedInputs.push({
             path: relPath,
             name: file.name,
             type: getTestType(file.name),
-            time: fs.statSync(fullPath).mtime
+            time: fs.statSync(fullPath).mtime,
           })
         }
-      } else if (file.name.endsWith('.zip') && (file.name.includes('trace'))) {
+      } else if (file.name.endsWith('.zip') && file.name.includes('trace')) {
         // Trace artifact
         const relPath = path.relative(process.cwd(), fullPath)
         artifactIndex.traces.push({
           path: relPath,
           name: file.name,
-          time: fs.statSync(fullPath).mtime
+          time: fs.statSync(fullPath).mtime,
         })
       }
     }

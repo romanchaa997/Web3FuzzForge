@@ -53,7 +53,7 @@ test.describe('MetaMask Signing Test', () => {
         },
         on: (eventName, callback) => {
           console.log(`MetaMask mock: registered event listener for ${eventName}`)
-        }
+        },
       }
     })
 

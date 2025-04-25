@@ -29,14 +29,14 @@ function getContributorInfo(testFilePath) {
       date: commitDate,
       testPath: testFilePath,
       testName: path.basename(testFilePath),
-      commitHash
+      commitHash,
     }
   } catch (error) {
     console.error('Failed to get contributor info:', error.message)
     return {
       name: 'Unknown Contributor',
       testPath: testFilePath,
-      testName: path.basename(testFilePath)
+      testName: path.basename(testFilePath),
     }
   }
 }
@@ -68,7 +68,7 @@ async function recordContribution(testFilePath, testMetadata = {}) {
       testPath: contributor.testPath,
       type: testMetadata.type || 'Unknown',
       description: testMetadata.description || '',
-      impactScore: testMetadata.impactScore || 1
+      impactScore: testMetadata.impactScore || 1,
     })
 
     // Sort by date (newest first)
@@ -77,7 +77,9 @@ async function recordContribution(testFilePath, testMetadata = {}) {
     // Save updated contributions
     fs.writeFileSync(contributionsPath, JSON.stringify(contributions, null, 2))
 
-    console.log(`✅ Recorded contribution from ${contributor.name} for test ${contributor.testName}`)
+    console.log(
+      `✅ Recorded contribution from ${contributor.name} for test ${contributor.testName}`
+    )
   } catch (error) {
     console.error('Failed to record contribution:', error.message)
   }
@@ -109,11 +111,12 @@ async function generateHallOfFame() {
 
     // Generate markdown content
     let markdown = '# Web3FuzzForge Hall of Fame\n\n'
-    markdown += 'This Hall of Fame celebrates the amazing contributors who have submitted Web3 fuzzing tests to help improve security across the ecosystem.\n\n'
+    markdown +=
+      'This Hall of Fame celebrates the amazing contributors who have submitted Web3 fuzzing tests to help improve security across the ecosystem.\n\n'
 
     // Sort contributors by number of contributions
-    const sortedContributors = Object.keys(contributorMap).sort((a, b) =>
-      contributorMap[b].length - contributorMap[a].length
+    const sortedContributors = Object.keys(contributorMap).sort(
+      (a, b) => contributorMap[b].length - contributorMap[a].length
     )
 
     markdown += '## Top Contributors\n\n'
@@ -143,7 +146,8 @@ async function generateHallOfFame() {
 
     // Add footer
     markdown += '\n---\n\n'
-    markdown += 'Want to see your name here? Submit a pull request with your own Web3 fuzzing test!\n'
+    markdown +=
+      'Want to see your name here? Submit a pull request with your own Web3 fuzzing test!\n'
 
     // Write to markdown file
     fs.writeFileSync(path.join(__dirname, '..', 'HALL_OF_FAME.md'), markdown)
@@ -157,5 +161,5 @@ async function generateHallOfFame() {
 module.exports = {
   getContributorInfo,
   recordContribution,
-  generateHallOfFame
+  generateHallOfFame,
 }

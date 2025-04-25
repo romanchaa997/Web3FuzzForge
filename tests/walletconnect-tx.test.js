@@ -75,10 +75,11 @@ test('Send transaction through WalletConnect', async ({ page }) => {
 
   // Manually make the wallet-info visible since our mock might not do it automatically
   await page.evaluate(() => {
-    document.getElementById('wallet-info').style.display = 'block';
-    document.querySelector('.wallet-address').textContent = '0x1234567890abcdef1234567890abcdef12345678';
-    document.getElementById('network-name').textContent = 'Ethereum Mainnet';
-  });
+    document.getElementById('wallet-info').style.display = 'block'
+    document.querySelector('.wallet-address').textContent =
+      '0x1234567890abcdef1234567890abcdef12345678'
+    document.getElementById('network-name').textContent = 'Ethereum Mainnet'
+  })
 
   // Wait for wallet info to be displayed
   const walletInfo = await page.locator('#wallet-info')
@@ -97,9 +98,10 @@ test('Send transaction through WalletConnect', async ({ page }) => {
 
   // Make transaction confirmation visible
   await page.evaluate(() => {
-    document.getElementById('tx-confirmation').style.display = 'block';
-    document.getElementById('tx-hash').textContent = '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
-  });
+    document.getElementById('tx-confirmation').style.display = 'block'
+    document.getElementById('tx-hash').textContent =
+      '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890'
+  })
 
   // Verify transaction success
   console.log('Verifying transaction confirmation...')

@@ -18,4 +18,4 @@
   },
   "include": ["src/**/*", "tests/**/*", "utils/**/*"],
   "exclude": ["node_modules", "dist"]
-} 
+}

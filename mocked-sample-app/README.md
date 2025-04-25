@@ -78,4 +78,4 @@ docker run -p 3000:3000 web3-mock-dapp
 
 ## License
 
-This project is licensed under the MIT License. 
+This project is licensed under the MIT License.

@@ -4,15 +4,36 @@ sidebar_position: 3
 
 # Quickstart
 
-This guide will help you quickly get up and running with Web3FuzzForge by generating your first test templates.
+## Run Your First Test in 5 Minutes
 
-![Web3FuzzForge Quickstart](../static/img/web3fuzzforge-quickstart.gif)
+Get started with Web3FuzzForge in just 5 minutes:
 
-## Generate Your First Test
+1. **Install the package**
+   ```bash
+   npm install -g web3fuzzforge
+   ```
+
+2. **Generate a wallet connection test**
+   ```bash
+   web3fuzzforge generate connect --wallet metamask --out ./test.js
+   ```
+
+3. **Install testing dependencies**
+   ```bash
+   npm install -D @playwright/test
+   npx playwright install
+   ```
+
+4. **Run your first test**
+   ```bash
+   npx playwright test test.js --headed
+   ```
+
+That's it! You've just run your first automated Web3 test.
+
+## Common Test Types
 
 ### Wallet Connection Test
-
-Generate a test for connecting to a MetaMask wallet:
 
 ```bash
 web3fuzzforge generate connect --wallet metamask --out ./tests/connection.test.js
@@ -20,15 +41,11 @@ web3fuzzforge generate connect --wallet metamask --out ./tests/connection.test.j
 
 ### Transaction Test
 
-Generate a test for sending a transaction through MetaMask:
-
 ```bash
 web3fuzzforge generate tx --wallet metamask --out ./tests/transaction.test.js
 ```
 
 ### Signature Test
-
-Generate a test for signing a message with MetaMask:
 
 ```bash
 web3fuzzforge generate sign --wallet metamask --out ./tests/sign.test.js
@@ -52,14 +69,9 @@ web3fuzzforge generate connect --preset erc --out ./tests/nft-connect-test.js
 
 # For DeFi applications
 web3fuzzforge generate tx --preset defi --out ./tests/defi-swap-test.js
-
-# For DAO applications
-web3fuzzforge generate sign --preset dao --out ./tests/dao-voting-test.js
 ```
 
 ## Running Tests
-
-Web3FuzzForge generates tests for Playwright. Run them with:
 
 ```bash
 # In headless mode
@@ -69,16 +81,6 @@ npx playwright test tests/connection.test.js
 npx playwright test tests/connection.test.js --headed
 ```
 
-## Using the AI Assistant
-
-For more intuitive configuration, use the `ask` command:
-
-```bash
-web3fuzzforge ask "generate a MetaMask connection test for a DeFi app"
-```
-
-This will create a `.web3fuzzforge.json` configuration file you can use for subsequent test generation.
-
 ## Next Steps
 
-Explore the [Commands](commands) documentation to learn about all available options, or check out [Wallet Support](wallet-support) to see which wallets you can test with. 
+Explore the [Commands Reference](commands-reference) for all available options or check out [Advanced Guides](advanced-guides) for more complex scenarios.

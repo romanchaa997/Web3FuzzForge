@@ -46,7 +46,7 @@ You can customize the reports by:
 module.exports = {
   reporter: [
     ['html', { outputFolder: 'test-reports' }],
-    ['json', { outputFile: 'results.json' }]
+    ['json', { outputFile: 'results.json' }],
   ],
   // ...other configuration
 };
@@ -59,14 +59,14 @@ test('Connection test with custom metadata', async ({ page }, testInfo) => {
   // Add custom testing metadata
   testInfo.annotations.push({
     type: 'wallet',
-    description: 'MetaMask'
+    description: 'MetaMask',
   });
-  
+
   testInfo.annotations.push({
     type: 'test_category',
-    description: 'security'
+    description: 'security',
   });
-  
+
   // Run your test...
 });
 ```
@@ -85,4 +85,4 @@ Based on community feedback, we plan to enhance the reporting system with:
 
 ## Contributing to Reporting Improvements
 
-We welcome community contributions to our reporting system. See the [vulnerability-categorization](vulnerability-categorization) page for details on how to help standardize Web3 security vulnerability classifications. 
+We welcome community contributions to our reporting system. See the [vulnerability-categorization](vulnerability-categorization) page for details on how to help standardize Web3 security vulnerability classifications.

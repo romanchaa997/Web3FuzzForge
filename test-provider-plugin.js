@@ -17,7 +17,7 @@ console.log('Testing provider plugins directly with commands...')
 
 // Create a mock DOM environment
 const mockCommands = {
-  appendToOutput: mockAppendToOutput
+  appendToOutput: mockAppendToOutput,
 }
 
 // Test commands directly

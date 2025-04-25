@@ -63,4 +63,4 @@ This should display the current version of Web3FuzzForge.
 
 ## Next Steps
 
-Once installed, head to the [Quickstart](quickstart) guide to generate your first test template. 
+Once installed, head to the [Quickstart](quickstart) guide to generate your first test template.

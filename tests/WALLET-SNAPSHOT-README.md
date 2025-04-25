@@ -1,116 +1,164 @@
-# Wallet State Snapshot Testing
+# Wallet Snapshot Testing Guide
 
-This directory contains tests that demonstrate how to save and restore wallet state during testing, which is useful for:
+This guide demonstrates how to use wallet state snapshots effectively in your Web3 application tests.
 
-1. Setting up specific wallet conditions for tests
-2. Capturing the state before/after actions
-3. Testing state transitions
-4. Saving important data alongside the wallet state
+## Introduction
 
-## Available Tests
+Wallet state snapshots allow you to:
 
-- `wallet-snapshot-simple.test.js` - Clean, reliable tests focused on wallet state functionality
-- `wallet-snapshot.test.js` - More complex examples with UI interactions (currently needs fixing)
+- Save the current state of a wallet (address, chain ID, etc.)
+- Restore a previously saved state
+- Test complex user flows that involve multiple wallet states
+- Compare different wallet configurations
 
-## How to Run
+## Basic Usage Pattern
+
+Here's the recommended pattern for wallet state testing:
+
+```javascript
+const { test, expect } = require('@playwright/test');
+
+test.describe('Wallet State Tests', () => {
+  // Create page and setup test page in beforeEach
+
+  // Helper to save wallet state
+  async function saveState(page) {
+    return await page.evaluate(() => {
+      return {
+        connected: window.ethereum.selectedAddress !== null,
+        address: window.ethereum.selectedAddress,
+        chainId: window.ethereum.chainId,
+        networkVersion: window.ethereum.networkVersion,
+        // Add any other state you need to save
+      };
+    });
+  }
+
+  // Helper to restore wallet state
+  async function restoreState(page, state) {
+    await page.evaluate(state => {
+      // Restore ethereum properties
+      window.ethereum.selectedAddress = state.address;
+      window.ethereum.chainId = state.chainId;
+      window.ethereum.networkVersion = state.networkVersion;
+
+      // Update UI to match (important!)
+      updateUI();
+
+      function updateUI() {
+        // Update wallet info display
+        if (state.connected) {
+          document.getElementById('wallet-info').style.display = 'block';
+          document.getElementById('address').textContent = state.address;
+          // Update network display
+        } else {
+          document.getElementById('wallet-info').style.display = 'none';
+          // Clear wallet UI
+        }
+      }
+    }, state);
+  }
+
+  test('Sample wallet state test', async () => {
+    // Connect wallet
+    await connectWallet(page);
+
+    // Save connected state
+    const connectedState = await saveState(page);
+
+    // Disconnect wallet
+    await disconnectWallet(page);
+
+    // Restore connected state
+    await restoreState(page, connectedState);
+
+    // Verify wallet is connected again
+    const walletAddress = await page.locator('#address').textContent();
+    expect(walletAddress).toBe(connectedState.address);
+  });
+});
+```
+
+## Important Tips
+
+1. **Direct DOM Manipulation**
+
+   - Always update the UI elements directly when restoring state
+   - Don't rely on UI events to trigger updates
+
+2. **Thorough State Saving**
+
+   - Save all relevant state properties
+   - Include UI state information when needed
+   - Add timestamps or other metadata for debugging
+
+3. **Explicit State Restoration**
+
+   - Restore all properties explicitly
+   - Update UI elements to match the restored state
+   - Use helper functions to simplify repetitive operations
+
+4. **Error Handling**
+   - Add null checks for all DOM elements
+   - Implement proper error handling for edge cases
+   - Log state changes for debugging
+
+## Complete Example
+
+For a complete, working example of wallet state testing, see [wallet-snapshot-simple.test.js](./wallet-snapshot-simple.test.js).
+
+## Running the Tests
+
+To run the wallet snapshot tests:
 
 ```bash
-# Run the simplified wallet snapshot tests
-npx playwright test tests/wallet-snapshot-simple.test.js
-
-# Run the full wallet snapshot tests (when fixed)
-npx playwright test tests/wallet-snapshot.test.js
+# Set environment variables and run tests
+$env:MOCK_MODE="true"; npx playwright test tests/wallet-snapshot-simple.test.js --headed
 ```
-
-## Core Wallet Snapshot Functions
-
-### `saveWalletState(page, customData = {})`
-
-Captures the current state of a wallet, including:
-- Selected address
-- Chain ID
-- Any custom data you wish to associate with this state
-
-Example:
-```javascript
-const walletState = await saveWalletState(page, {
-  txHash: '0x1234...',
-  testScenario: 'after withdrawal',
-  amount: '0.5 ETH'
-});
-```
-
-### `restoreWalletState(page, state)`
-
-Restores a previously saved wallet state, including:
-- Selected address
-- Chain ID
-
-Example:
-```javascript
-// Restore to previously saved state
-await restoreWalletState(page, walletState);
-```
-
-## Common Testing Patterns
-
-### 1. Capturing and Verifying State Transitions
-
-```javascript
-// Save initial state
-const initialState = await saveWalletState(page);
-
-// Perform an action (e.g., network switch)
-await switchNetwork(page, 'polygon');
-
-// Save the new state
-const newState = await saveWalletState(page);
-
-// Verify the change
-expect(newState.chainId).not.toBe(initialState.chainId);
-```
-
-### 2. Testing Multiple Related Operations
-
-```javascript
-// Connect wallet
-await connectWallet(page);
-const connectedState = await saveWalletState(page);
-
-// Perform a transaction
-await sendTransaction(page, {...});
-const postTxState = await saveWalletState(page, { txComplete: true });
-
-// Restore back to connected state
-await restoreWalletState(page, connectedState);
-```
-
-### 3. Storing Metadata with Wallet State
-
-```javascript
-// After a test action, save state with metadata
-const state = await saveWalletState(page, {
-  lastAction: 'withdrawal',
-  amount: '0.1 ETH',
-  timestamp: Date.now(),
-  recipient: '0x1234...'
-});
-
-// Later, you can use this metadata
-console.log(state.customData.lastAction); // 'withdrawal'
-```
-
-## Implementation Details
-
-The wallet snapshot utilities work by:
-
-1. Using page.evaluate() to access the window.ethereum object in the browser
-2. Capturing and restoring critical properties: selectedAddress and chainId
-3. Supporting optional custom data storage
-4. Being platform-agnostic - works with any wallet that exposes a window.ethereum object
 
 ## Troubleshooting
 
-- If tests fail with `Cannot read properties of undefined (reading 'selectedAddress')`, ensure window.ethereum is properly initialized
-- For UI-related tests, make sure to update both the ethereum object AND the UI elements
-- Use optional chaining (`?.`) when accessing ethereum properties to avoid errors 
+**Problem:** UI elements don't update when state is restored.
+
+**Solution:** Make sure to explicitly update the UI in your restore function:
+
+```javascript
+// Always manually update UI elements after state change
+function updateUI() {
+  document.getElementById('wallet-info').style.display = state.connected ? 'block' : 'none';
+  document.getElementById('address').textContent = state.address || 'Not connected';
+  // Update other UI elements...
+}
+```
+
+**Problem:** State saving returns null.
+
+**Solution:** Add fallback values and better validation:
+
+```javascript
+// Helper with fallback values
+async function saveState(page) {
+  const state = await page.evaluate(() => {
+    const defaultState = {
+      connected: false,
+      address: null,
+      chainId: '0x1',
+    };
+
+    if (!window.ethereum) {
+      console.error('No wallet detected, using default state');
+      return defaultState;
+    }
+
+    return {
+      connected: window.ethereum.selectedAddress !== null,
+      address: window.ethereum.selectedAddress || defaultState.address,
+      chainId: window.ethereum.chainId || defaultState.chainId,
+    };
+  });
+
+  // Add timestamp for debugging
+  state.timestamp = new Date().toISOString();
+  return state;
+}
+```

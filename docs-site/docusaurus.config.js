@@ -87,4 +87,4 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} Web3FuzzForge. Built with Docusaurus.`,
     },
   },
-}
+};

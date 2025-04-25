@@ -43,7 +43,13 @@ interface EthereumProvider {
 
 declare global {
   interface Window {
-    ethereum?: EthereumProvider;
+    ethereum?: EthereumProvider & {
+      isMetaMask?: boolean;
+      isCoinbaseWallet?: boolean;
+      isPhantom?: boolean;
+      isRabby?: boolean;
+      isWalletConnect?: boolean;
+    };
   }
 }
 

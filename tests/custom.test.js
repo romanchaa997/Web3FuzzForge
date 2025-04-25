@@ -21,7 +21,7 @@ test.describe('MetaMask Connection Test', () => {
       window.ethereum = {
         isMetaMask: true,
         selectedAddress: null,
-        chainId: '0x1', // Add chainId property 
+        chainId: '0x1', // Add chainId property
         request: async ({ method }) => {
           console.log(`MetaMask mock: ${method} called`)
           if (method === 'eth_requestAccounts') {

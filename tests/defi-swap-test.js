@@ -46,7 +46,7 @@ test.describe('MetaMask Transaction Test', () => {
         },
         on: (eventName, callback) => {
           console.log(`MetaMask mock: registered event listener for ${eventName}`)
-        }
+        },
       }
     })
 

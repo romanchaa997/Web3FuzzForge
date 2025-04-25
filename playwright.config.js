@@ -9,24 +9,31 @@ function getTestModeConfig() {
   // Default configuration
   const config = {
     mockMode: process.env.MOCK_MODE === 'true',
-    targetUrl: process.env.TARGET_URL || ''
-  };
-  
-  // If no target URL is provided, use mock mode
-  if (!config.targetUrl && !config.mockMode) {
-    throw new Error('Either TARGET_URL environment variable or MOCK_MODE=true must be set. Use MOCK_MODE=true to use the built-in mock dApp or TARGET_URL=http://your-app-url to test against a real application.');
+    targetUrl: process.env.TARGET_URL || '',
+    selfContained: process.env.SELF_CONTAINED === 'true',
   }
-  
+
+  // For tests that don't need external URLs (self-contained tests)
+  if (config.selfContained) {
+    return { selfContained: true }
+  }
+
+  // If no target URL is provided and not in mock mode or self-contained mode, use mock mode by default
+  if (!config.targetUrl && !config.mockMode && !config.selfContained) {
+    console.warn('No TARGET_URL or MOCK_MODE provided, defaulting to self-contained tests.')
+    return { selfContained: true }
+  }
+
   // If mock mode is enabled, set the target URL to the local mock dApp
   if (config.mockMode) {
-    config.targetUrl = 'http://localhost:3000';
+    config.targetUrl = 'http://localhost:3002'
   }
-  
-  return config;
+
+  return config
 }
 
 // Get test mode configuration
-const testConfig = getTestModeConfig();
+const testConfig = getTestModeConfig()
 
 /**
  * @see https://playwright.dev/docs/test-configuration
@@ -49,19 +56,13 @@ module.exports = defineConfig({
 
   // Reporter to use
   reporter: process.env.CI
-    ? [
-        ['html', { outputFolder: 'reports', open: 'never' }],
-        ['list']
-      ]
-    : [
-        ['html', { outputFolder: 'reports', open: 'on-failure' }],
-        ['list']
-      ],
+    ? [['html', { outputFolder: 'reports', open: 'never' }], ['list']]
+    : [['html', { outputFolder: 'reports', open: 'on-failure' }], ['list']],
 
   // Shared settings for all the projects below
   use: {
     // Base URL to use in actions like `await page.goto('/')`
-    baseURL: testConfig.targetUrl || undefined,
+    baseURL: testConfig.selfContained ? undefined : testConfig.targetUrl || undefined,
 
     // Collect trace when retrying the failed test
     trace: 'retain-on-failure',

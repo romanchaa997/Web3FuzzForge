@@ -4,9 +4,9 @@ This Hall of Fame celebrates the amazing contributors who have submitted Web3 fu
 
 ## Top Contributors
 
-| Contributor | Tests Submitted | Impact Score |
-|-------------|----------------|-------------|
-| Web3FuzzForge Team | 3 | 3 |
+| Contributor        | Tests Submitted | Impact Score |
+| ------------------ | --------------- | ------------ |
+| Web3FuzzForge Team | 3               | 3            |
 
 ## Recent Contributions
 
@@ -19,4 +19,4 @@ This Hall of Fame celebrates the amazing contributors who have submitted Web3 fu
 
 ---
 
-Want to see your name here? Submit a pull request with your own Web3 fuzzing test! 
+Want to see your name here? Submit a pull request with your own Web3 fuzzing test!

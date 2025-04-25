@@ -13,13 +13,13 @@ const { connectWallet, setupWalletState } = require('../../utils/wallet-helpers'
 const { recordContribution } = require('../../utils/contributor-tracker')
 
 test.describe('Network Switch Race Condition Tests', () => {
-  test.afterAll(async ({ }, testInfo) => {
+  test.afterAll(async ({}, testInfo) => {
     // Record this contribution to the Hall of Fame if tests pass
     if (testInfo.status === 'passed') {
       await recordContribution(__filename, {
         type: 'Wallet Connection',
         description: 'Tests for race conditions during network switching',
-        impactScore: 2 // Higher impact due to potential fund loss
+        impactScore: 2, // Higher impact due to potential fund loss
       })
     }
   })
@@ -41,13 +41,13 @@ test.describe('Network Switch Race Condition Tests', () => {
 
       // Add delay to simulate real network switching
       const originalRequest = window.ethereum.request
-      window.ethereum.request = async (args) => {
+      window.ethereum.request = async args => {
         if (args.method === 'wallet_switchEthereumChain') {
           const targetChain = args.params[0].chainId
           window._networkSwitches.push({
             timestamp: Date.now(),
             from: window._currentNetwork,
-            to: targetChain
+            to: targetChain,
           })
 
           // Set flag indicating network switch in progress
@@ -92,14 +92,14 @@ test.describe('Network Switch Race Condition Tests', () => {
     const switchesToExecute = [
       { name: 'to Polygon', chainId: '0x89' },
       { name: 'to Arbitrum', chainId: '0xa4b1' },
-      { name: 'back to Ethereum', chainId: '0x1' }
+      { name: 'back to Ethereum', chainId: '0x1' },
     ]
 
     // Execute the rapid network switches (not waiting for completion)
     for (const networkSwitch of switchesToExecute) {
       await page.evaluate(chainId => {
         window.ethereum.request({
-          method: 'wallet_switchEthereumChain', params: [{ chainId }]
+          method: 'wallet_switchEthereumChain', params: [{ chainId }],
         })
 
         // Don't wait - we want to trigger them rapidly
@@ -111,15 +111,19 @@ test.describe('Network Switch Race Condition Tests', () => {
 
     // Now immediately try to execute a transaction while networks are switching
     const txPromise = page.evaluate(() => {
-      return window.ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [{
-          from: window.ethereum.selectedAddress,
-          to: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
-          value: '0x1', // minimal value
-          gas: '0x5208', // 21000 gas
-        }]
-      }).catch(e => ({ error: e.message }))
+      return window.ethereum
+        .request({
+          method: 'eth_sendTransaction',
+          params: [
+            {
+              from: window.ethereum.selectedAddress,
+              to: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+              value: '0x1', // minimal value
+              gas: '0x5208', // 21000 gas
+            },
+          ],
+        })
+        .catch(e => ({ error: e.message }))
     })
 
     // Wait a moment for all operations to settle
@@ -157,7 +161,7 @@ test.describe('Network Switch Race Condition Tests', () => {
     // First switch to Polygon
     await page.evaluate(() => {
       return window.ethereum.request({
-        method: 'wallet_switchEthereumChain', params: [{ chainId: '0x89' }]
+        method: 'wallet_switchEthereumChain', params: [{ chainId: '0x89' }],
       })
     })
 
@@ -167,7 +171,7 @@ test.describe('Network Switch Race Condition Tests', () => {
     // Now switch to Arbitrum
     await page.evaluate(() => {
       return window.ethereum.request({
-        method: 'wallet_switchEthereumChain', params: [{ chainId: '0xa4b1' }]
+        method: 'wallet_switchEthereumChain', params: [{ chainId: '0xa4b1' }],
       })
     })
 
@@ -182,15 +186,19 @@ test.describe('Network Switch Race Condition Tests', () => {
 
     // Send a transaction now that networks are stable
     const txResult = await page.evaluate(() => {
-      return window.ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [{
-          from: window.ethereum.selectedAddress,
-          to: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
-          value: '0x1', // minimal value
-          gas: '0x5208', // 21000 gas
-        }]
-      }).catch(e => ({ error: e.message }))
+      return window.ethereum
+        .request({
+          method: 'eth_sendTransaction',
+          params: [
+            {
+              from: window.ethereum.selectedAddress,
+              to: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+              value: '0x1', // minimal value
+              gas: '0x5208', // 21000 gas
+            },
+          ],
+        })
+        .catch(e => ({ error: e.message }))
     })
 
     // Verify transaction wasn't during a switch

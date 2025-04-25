@@ -24,8 +24,9 @@ test.describe('MetaMask Connection Test', () => {
       window.ethereum = {
         isMetaMask: true,
         selectedAddress: null,
-        chainId: '0x1', // Add chainId property to satisfy the type
-        request: async ({ method }) => {
+        chainId: '0x1',
+        networkVersion: '1',
+        request: async ({ method, params }): Promise<unknown> => {
           console.log(`MetaMask mock: ${method} called`)
           if (method === 'eth_requestAccounts') {
             window.ethereum!.selectedAddress = '0x1234567890abcdef1234567890abcdef12345678'

@@ -1,0 +1,27 @@
+{
+  "id": "cross-chain-testing",
+  "title": "Cross-Chain Testing",
+  "description": "As multi-chain dApps become increasingly common, comprehensive testing across different blockchain networks is critical. Web3FuzzForge provides tools and patterns for testing cross-chain functionality.",
+  "source": "@site/docs/cross-chain-testing.md",
+  "sourceDirName": ".",
+  "slug": "/cross-chain-testing",
+  "permalink": "/docs/cross-chain-testing",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/web3fuzzforge/web3-security-test-kit/edit/main/docs-site/docs/cross-chain-testing.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 3,
+  "frontMatter": {
+    "sidebar_position": 3
+  },
+  "sidebar": "mainSidebar",
+  "previous": {
+    "title": "Wallet State Snapshot Framework",
+    "permalink": "/docs/wallet-state-snapshots"
+  },
+  "next": {
+    "title": "Security Testing",
+    "permalink": "/docs/security-testing"
+  }
+}

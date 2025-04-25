@@ -6,23 +6,23 @@
  */
 export function injectRabbyProvider(logger = console.log) {
   logger('Injecting Rabby Wallet provider (placeholder)')
-  
+
   // TODO: Implement proper Rabby wallet provider injection
   // This is a placeholder implementation
-  
+
   // The Rabby provider would typically include these methods:
   // - connect: Connect to the wallet
   // - disconnect: Disconnect from the wallet
   // - signTransaction: Sign a transaction
   // - signMessage: Sign a message
   // - etc.
-  
+
   return {
     name: 'Rabby Wallet',
-    isImplemented: false
+    isImplemented: false,
   }
 }
 
 module.exports = {
-  injectRabbyProvider
-} 
+  injectRabbyProvider,
+}

@@ -11,6 +11,7 @@ Web3FuzzForge is an automated test scaffolding tool for battle-tested Web3 devel
 Every decent web3 project has smart contract tests. Few have UI tests. That's a security nightmare.
 
 This tool generates test templates that automate the previously unautomatable:
+
 - MetaMask interactions
 - Wallet connections
 - Transaction signing
@@ -30,4 +31,4 @@ All through programmable interfaces that make testing Web3 applications signific
 
 ## What's Next?
 
-Check out the [Installation](installation) guide to get started, or jump straight to the [Quickstart](quickstart) if you're ready to dive in. 
+Check out the [Installation](installation) guide to get started, or jump straight to the [Quickstart](quickstart) if you're ready to dive in.

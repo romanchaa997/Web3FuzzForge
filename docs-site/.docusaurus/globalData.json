@@ -1,0 +1,102 @@
+{
+  "docusaurus-plugin-content-docs": {
+    "default": {
+      "path": "/docs",
+      "versions": [
+        {
+          "name": "current",
+          "label": "Next",
+          "isLast": true,
+          "path": "/docs",
+          "mainDocId": "overview",
+          "docs": [
+            {
+              "id": "advanced-guides",
+              "path": "/docs/advanced-guides",
+              "sidebar": "mainSidebar"
+            },
+            {
+              "id": "commands-reference",
+              "path": "/docs/commands-reference",
+              "sidebar": "mainSidebar"
+            },
+            {
+              "id": "community-test-examples",
+              "path": "/docs/community-test-examples",
+              "sidebar": "mainSidebar"
+            },
+            {
+              "id": "cross-chain-testing",
+              "path": "/docs/cross-chain-testing",
+              "sidebar": "mainSidebar"
+            },
+            {
+              "id": "installation",
+              "path": "/docs/installation",
+              "sidebar": "mainSidebar"
+            },
+            {
+              "id": "intro",
+              "path": "/docs/intro"
+            },
+            {
+              "id": "mobile-wallets",
+              "path": "/docs/mobile-wallets",
+              "sidebar": "mainSidebar"
+            },
+            {
+              "id": "overview",
+              "path": "/docs/overview",
+              "sidebar": "mainSidebar"
+            },
+            {
+              "id": "quickstart",
+              "path": "/docs/quickstart",
+              "sidebar": "mainSidebar"
+            },
+            {
+              "id": "real-wallet-integration",
+              "path": "/docs/real-wallet-integration",
+              "sidebar": "mainSidebar"
+            },
+            {
+              "id": "reporting-overview",
+              "path": "/docs/reporting-overview",
+              "sidebar": "mainSidebar"
+            },
+            {
+              "id": "security-testing",
+              "path": "/docs/security-testing",
+              "sidebar": "mainSidebar"
+            },
+            {
+              "id": "vulnerability-categorization",
+              "path": "/docs/vulnerability-categorization",
+              "sidebar": "mainSidebar"
+            },
+            {
+              "id": "wallet-state-snapshots",
+              "path": "/docs/wallet-state-snapshots",
+              "sidebar": "mainSidebar"
+            },
+            {
+              "id": "why-it-matters",
+              "path": "/docs/why-it-matters",
+              "sidebar": "mainSidebar"
+            }
+          ],
+          "draftIds": [],
+          "sidebars": {
+            "mainSidebar": {
+              "link": {
+                "path": "/docs/overview",
+                "label": "overview"
+              }
+            }
+          }
+        }
+      ],
+      "breadcrumbs": true
+    }
+  }
+}

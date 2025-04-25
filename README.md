@@ -2,6 +2,28 @@
 
 A comprehensive toolkit for testing Web3 dApps, focusing on security and functional testing.
 
+📚 **[Full Documentation](https://docs.web3fuzzforge.dev)** - Visit our comprehensive documentation site for guides, tutorials, and reference materials.
+
+## Documentation
+
+The project documentation is built with Docusaurus and available at [docs.web3fuzzforge.dev](https://docs.web3fuzzforge.dev).
+
+### Running the documentation locally
+
+```bash
+# On Windows
+cd docs-site
+npm install
+npm start
+
+# Deploy (Windows)
+.\deploy-docs.ps1
+
+# Deploy (macOS/Linux)
+chmod +x deploy-docs.sh
+./deploy-docs.sh
+```
+
 ## Setup & Installation
 
 ### Local Installation (Recommended)
@@ -28,77 +50,33 @@ npm run forge:gen connect -- --wallet metamask --out ./tests/connection-test.js
 npm run forge:run -- --mock-mode --headed
 ```
 
+## CLI Help Output
+
+```
+Usage: web3fuzzforge <command> [options]
+
+Commands:
+  generate       Generate test templates
+  run            Run test suite
+  doctor         Check environment setup
+  snapshot       Create and manage wallet snapshots
+  fuzz           Run fuzz testing on dApp
+  help           Show help for a command
+
+Options:
+  -v, --version  Show version number
+  -h, --help     Show help
+
+Examples:
+  web3fuzzforge generate connect --wallet metamask --out ./tests/connection.test.js
+  web3fuzzforge run --mock-mode --headed
+  web3fuzzforge doctor
+
+For detailed documentation, visit: https://docs.web3fuzzforge.dev
+```
+
 ## Usage
 
 ### Generate Test Templates
 
-```bash
-# Generate a wallet connection test
-web3fuzzforge generate connect --wallet metamask --out ./tests/connection-test.js
-
-# Generate a transaction test
-web3fuzzforge generate tx --wallet metamask --out ./tests/transaction-test.js
-
-# Generate a security-focused test with fuzzing
-web3fuzzforge generate tx --wallet metamask --out ./tests/security-tx-test.js --fuzz
 ```
-
-### Run Tests
-
-```bash
-# Run tests with mock dApp (for development)
-web3fuzzforge run --mock-mode --headed
-
-# Run tests against a specific dApp
-web3fuzzforge run --target-url=https://your-dapp.com
-```
-
-## Troubleshooting UI Visibility Issues
-
-If you're experiencing test failures related to UI visibility, try these solutions:
-
-1. Use the `forceShowWalletUI` helper function instead of visibility assertions:
-
-```javascript
-const { forceShowWalletUI } = require('./utils/wallet-snapshot');
-
-// Instead of this:
-// await expect(page.locator('#wallet-info')).toBeVisible();
-
-// Use this:
-await forceShowWalletUI(page);
-```
-
-2. Check content directly instead of visibility:
-
-```javascript
-// Instead of checking visibility:
-// await expect(page.locator('#wallet-info')).toBeVisible();
-
-// Check the content directly:
-const walletAddress = await page.locator('.wallet-address').textContent();
-expect(walletAddress).toContain('0x123...');
-```
-
-3. Force UI elements to show programmatically:
-
-```javascript
-await page.evaluate(() => {
-  const walletInfo = document.getElementById('wallet-info');
-  if (walletInfo) walletInfo.style.display = 'block';
-});
-```
-
-## Common Issues
-
-### Package Not Found Error
-
-If you see `npm error 404 Not Found - GET https://registry.npmjs.org/web3fuzzforge`, use the local installation method described above.
-
-### UI Element Not Visible
-
-Tests failing with `Timed out 10000ms waiting for expect(locator).toBeVisible()` should be updated to use the improved UI handling methods in the utils folder.
-
-## License
-
-MIT

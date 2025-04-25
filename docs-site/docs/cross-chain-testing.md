@@ -20,15 +20,15 @@ Cross-chain testing involves verifying that your application functions correctly
 
 Web3FuzzForge test templates can be configured for multiple networks:
 
-| Network | Chain ID | Test Networks |
-|---------|----------|---------------|
-| Ethereum | 0x1 | Sepolia (0xaa36a7), Goerli (0x5) |
-| Polygon | 0x89 | Mumbai (0x13881) |
-| Arbitrum | 0xa4b1 | Arbitrum Goerli (0x66eed) |
-| Optimism | 0xa | Optimism Goerli (0x1a4) |
-| BNB Chain | 0x38 | BSC Testnet (0x61) |
-| Avalanche | 0xa86a | Fuji (0xa869) |
-| Solana | N/A | Devnet, Testnet |
+| Network   | Chain ID | Test Networks                    |
+| --------- | -------- | -------------------------------- |
+| Ethereum  | 0x1      | Sepolia (0xaa36a7), Goerli (0x5) |
+| Polygon   | 0x89     | Mumbai (0x13881)                 |
+| Arbitrum  | 0xa4b1   | Arbitrum Goerli (0x66eed)        |
+| Optimism  | 0xa      | Optimism Goerli (0x1a4)          |
+| BNB Chain | 0x38     | BSC Testnet (0x61)               |
+| Avalanche | 0xa86a   | Fuji (0xa869)                    |
+| Solana    | N/A      | Devnet, Testnet                  |
 
 ## Test Templates for Multi-Chain dApps
 
@@ -40,13 +40,13 @@ test('Test network switching', async ({ page }) => {
   await setupWalletState(page, {
     chainId: '0x1', // Ethereum Mainnet
   });
-  
+
   // Verify we're on Ethereum
   const initialChainId = await page.evaluate(() => {
     return window.ethereum.request({ method: 'eth_chainId' });
   });
   expect(initialChainId).toBe('0x1');
-  
+
   // Switch to Polygon
   await page.evaluate(() => {
     return window.ethereum.request({
@@ -54,16 +54,16 @@ test('Test network switching', async ({ page }) => {
       params: [{ chainId: '0x89' }], // Polygon
     });
   });
-  
+
   // Verify the app handles the network switch
   await page.waitForSelector('[data-testid="network-polygon"]');
-  
+
   // Verify chain ID update
   const newChainId = await page.evaluate(() => {
     return window.ethereum.request({ method: 'eth_chainId' });
   });
   expect(newChainId).toBe('0x89');
-  
+
   // Test app functionality on the new network
   await page.click('#transaction-button');
   // ... Continue testing on Polygon
@@ -76,7 +76,7 @@ test('Test network switching', async ({ page }) => {
 test('Test cross-chain state consistency', async ({ page }) => {
   // Set up wallet state
   const walletState = await setupWalletState(page);
-  
+
   // Interact with app on Ethereum
   await page.evaluate(() => {
     return window.ethereum.request({
@@ -84,7 +84,7 @@ test('Test cross-chain state consistency', async ({ page }) => {
       params: [{ chainId: '0x1' }],
     });
   });
-  
+
   // Record application state
   const ethereumState = await page.evaluate(() => {
     return {
@@ -92,7 +92,7 @@ test('Test cross-chain state consistency', async ({ page }) => {
       nfts: document.querySelector('#nft-count').textContent,
     };
   });
-  
+
   // Switch to Polygon
   await page.evaluate(() => {
     return window.ethereum.request({
@@ -100,10 +100,10 @@ test('Test cross-chain state consistency', async ({ page }) => {
       params: [{ chainId: '0x89' }],
     });
   });
-  
+
   // Wait for app to update
   await page.waitForSelector('[data-testid="network-polygon"]');
-  
+
   // Compare relevant state that should be consistent
   const polygonState = await page.evaluate(() => {
     return {
@@ -111,7 +111,7 @@ test('Test cross-chain state consistency', async ({ page }) => {
       // Other relevant state to compare
     };
   });
-  
+
   // Verify address stays consistent across chains
   expect(polygonState.userAddress).toBe(walletState.selectedAddress);
 });
@@ -123,34 +123,36 @@ test('Test cross-chain state consistency', async ({ page }) => {
 test('Test cross-chain bridge transaction', async ({ page }) => {
   // Start on Ethereum
   await setupWalletState(page, { chainId: '0x1' });
-  
+
   // Navigate to bridge UI
   await page.goto('https://your-dapp.com/bridge');
-  
+
   // Configure source chain (Ethereum)
   await page.selectOption('#source-chain', 'ethereum');
-  
+
   // Configure destination chain (Polygon)
   await page.selectOption('#destination-chain', 'polygon');
-  
+
   // Input amount to bridge
   await page.fill('#bridge-amount', '0.01');
-  
+
   // Initiate bridge transaction
   await page.click('#bridge-button');
-  
+
   // Approve transaction in wallet
   await page.click('[data-testid="confirm-transaction"]');
-  
+
   // Verify transaction started
   await page.waitForSelector('[data-testid="transaction-pending"]');
-  
+
   // Mock transaction completion (in real testing, you might wait longer or use events)
   await page.evaluate(() => {
     // Simulating a completed transaction
-    document.querySelector('[data-testid="transaction-pending"]').setAttribute('data-testid', 'transaction-complete');
+    document
+      .querySelector('[data-testid="transaction-pending"]')
+      .setAttribute('data-testid', 'transaction-complete');
   });
-  
+
   // Verify bridge transaction completes
   await page.waitForSelector('[data-testid="transaction-complete"]');
 });
@@ -166,28 +168,28 @@ For Ethereum Virtual Machine (EVM) compatible chains:
 // Helper function to test on multiple EVM chains
 async function testOnChain(page, chainId, chainName) {
   // Switch to specified chain
-  await page.evaluate((id) => {
+  await page.evaluate(id => {
     return window.ethereum.request({
       method: 'wallet_switchEthereumChain',
       params: [{ chainId: id }],
     });
   }, chainId);
-  
+
   // Verify chain switch
   const currentChain = await page.evaluate(() => {
     return window.ethereum.request({ method: 'eth_chainId' });
   });
   expect(currentChain).toBe(chainId);
-  
+
   console.log(`Testing on ${chainName}...`);
-  
+
   // App-specific testing on this chain
   // ...
 }
 
 test('Multi-chain EVM test', async ({ page }) => {
   await setupWalletState(page);
-  
+
   // Test on multiple EVM chains
   await testOnChain(page, '0x1', 'Ethereum Mainnet');
   await testOnChain(page, '0x89', 'Polygon');
@@ -203,20 +205,20 @@ For non-EVM chains like Solana:
 test('Test Solana interactions', async ({ page }) => {
   // Set up Phantom wallet with Solana
   await setupPhantomWallet(page, { network: 'mainnet-beta' });
-  
+
   // Navigate to Solana dApp
   await page.goto('https://your-solana-dapp.com');
-  
+
   // Connect Phantom wallet
   await page.click('#connect-wallet');
   await page.click('[data-testid="phantom-connect"]');
-  
+
   // Verify connection to Phantom
   const isConnected = await page.evaluate(() => {
     return window.solana && window.solana.isConnected;
   });
   expect(isConnected).toBeTruthy();
-  
+
   // Test Solana-specific functionality
   // ...
 });
@@ -241,4 +243,4 @@ We welcome community contributions of cross-chain test examples, particularly fo
 3. Non-EVM chains (Solana, Cosmos, Polkadot)
 4. Cross-chain bridges
 
-Submit your examples to the `web3fuzzforge-community-tests/cross-chain/` directory with proper documentation. 
+Submit your examples to the `web3fuzzforge-community-tests/cross-chain/` directory with proper documentation.

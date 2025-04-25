@@ -19,17 +19,17 @@ We welcome contributions from the community. To contribute your own test example
 
 ### Wallet Connection Tests
 
-| Name | Description | Author | Link |
-|------|-------------|--------|------|
-| Wallet Connection Hijacking Test | Tests for prevention of malicious connection requests | @web3-tester | [View Example](https://github.com/web3fuzzforge/web3-security-test-kit/blob/main/web3fuzzforge-community-tests/dapp-tests/wallet-connection/connection-hijacking-test.js) |
-| Multi-Wallet Support Test | Tests dApp compatibility with different wallet providers | @chain-defender | [View Example](https://github.com/web3fuzzforge/web3-security-test-kit/blob/main/web3fuzzforge-community-tests/dapp-tests/wallet-connection/multi-wallet-test.js) |
+| Name                             | Description                                              | Author          | Link                                                                                                                                                                      |
+| -------------------------------- | -------------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Wallet Connection Hijacking Test | Tests for prevention of malicious connection requests    | @web3-tester    | [View Example](https://github.com/web3fuzzforge/web3-security-test-kit/blob/main/web3fuzzforge-community-tests/dapp-tests/wallet-connection/connection-hijacking-test.js) |
+| Multi-Wallet Support Test        | Tests dApp compatibility with different wallet providers | @chain-defender | [View Example](https://github.com/web3fuzzforge/web3-security-test-kit/blob/main/web3fuzzforge-community-tests/dapp-tests/wallet-connection/multi-wallet-test.js)         |
 
 ### Transaction Flow Tests
 
-| Name | Description | Author | Link |
-|------|-------------|--------|------|
-| Transaction Parameter Manipulation | Tests for prevention of transaction parameter tampering | @smart-audit | [View Example](https://github.com/web3fuzzforge/web3-security-test-kit/blob/main/web3fuzzforge-community-tests/dapp-tests/transaction-flow/tx-parameter-test.js) |
-| Gas Optimization Test | Tests for reasonable gas limits and price suggestions | @gas-optimizer | [View Example](https://github.com/web3fuzzforge/web3-security-test-kit/blob/main/web3fuzzforge-community-tests/dapp-tests/transaction-flow/gas-optimization-test.js) |
+| Name                               | Description                                             | Author         | Link                                                                                                                                                                 |
+| ---------------------------------- | ------------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Transaction Parameter Manipulation | Tests for prevention of transaction parameter tampering | @smart-audit   | [View Example](https://github.com/web3fuzzforge/web3-security-test-kit/blob/main/web3fuzzforge-community-tests/dapp-tests/transaction-flow/tx-parameter-test.js)     |
+| Gas Optimization Test              | Tests for reasonable gas limits and price suggestions   | @gas-optimizer | [View Example](https://github.com/web3fuzzforge/web3-security-test-kit/blob/main/web3fuzzforge-community-tests/dapp-tests/transaction-flow/gas-optimization-test.js) |
 
 ## Example Details
 
@@ -42,6 +42,7 @@ This example tests for proper origin verification in wallet connection flows. It
 3. Verification that the dApp properly validates connection origins
 
 The test looks for:
+
 - Origin verification in connection requests
 - Proper error handling for invalid connection attempts
 - Clear user notifications about connection security
@@ -52,23 +53,23 @@ test('wallet connection origin verification', async ({ page }) => {
   // Set up legitimate connection
   await page.goto('https://legitimate-dapp.com');
   await page.click('#connect-wallet');
-  
+
   // Verify connection success
   await page.waitForSelector('[data-testid="connected-status"]');
-  
+
   // Set up spoofed connection from unexpected origin
   const spoofedPage = await context.newPage();
   await spoofedPage.goto('https://legitimate-dapp.com');
-  
+
   // Attempt to inject malicious origin
   await spoofedPage.evaluate(() => {
     // Attempt to spoof origin in connection request
     window.ethereum.request({
       method: 'eth_requestAccounts',
-      params: [{ origin: 'https://legitimate-dapp.com' }]
+      params: [{ origin: 'https://legitimate-dapp.com' }],
     });
   });
-  
+
   // Check for proper error handling
   const errorVisible = await spoofedPage.isVisible('[data-testid="connection-error"]');
   expect(errorVisible).toBeTruthy();
@@ -103,4 +104,4 @@ When contributing examples, please ensure they:
 3. Use realistic but safe testing approaches
 4. Follow best practices for test structure and readability
 5. Include appropriate assertions and verifications
-6. Avoid using real assets or mainnet in test examples 
+6. Avoid using real assets or mainnet in test examples

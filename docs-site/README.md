@@ -1,56 +1,63 @@
 # Web3FuzzForge Documentation Site
 
-This directory contains the Docusaurus-powered documentation site for Web3FuzzForge.
+This directory contains the Docusaurus-based documentation site for Web3FuzzForge.
 
-## Getting Started
-
-### Installation
+## Local Development
 
 ```bash
-# Navigate to the docs-site directory
-cd docs-site
-
 # Install dependencies
 npm install
+
+# Start local development server
+npm start
 ```
 
-### Local Development
+This will start a local development server and open up a browser window. Most changes are reflected live without having to restart the server.
+
+## Building for Production
 
 ```bash
-# Start the development server
-npm run start
-```
-
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
-
-### Build
-
-```bash
-# Build the static site
+# Build the site
 npm run build
+
+# Test the build locally
+npm run serve
 ```
 
-This command generates static content into the `build` directory and can be served using any static content hosting service.
+This command generates static content in the `build` directory that can be served using any static content hosting service.
 
-### Deployment
+## Deployment
 
 ```bash
-# Deploy to GitHub Pages
-GIT_USER=<Your GitHub username> npm run deploy
+# Easy deployment script
+./deploy-docs.sh
 ```
 
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push it to the `gh-pages` branch.
+Or manually:
+
+```bash
+GIT_USER=<Your GitHub username> \
+CURRENT_BRANCH=main \
+USE_SSH=true \
+npm run deploy
+```
+
+This command is a convenient way to build the website and push to the `gh-pages` branch.
 
 ## Documentation Structure
 
-The documentation is organized into the following sections:
+- **Getting Started**: overview, why-it-matters, installation, quickstart
+- **Reference**: commands-reference, advanced-guides
+- **Wallet Integration**: real-wallet-integration, mobile-wallets, wallet-state-snapshots
+- **Advanced Testing**: cross-chain-testing, security-testing
+- **Reporting**: reporting-overview, vulnerability-categorization
+- **Community**: community-test-examples
 
-- **Getting Started**: Introduction, installation, and quickstart guides
-- **Usage Guide**: Commands, wallet support, presets, and configuration
-- **Advanced Features**: Wallet state snapshots, security testing, performance benchmarking
-- **Reference**: Template structure, mobile wallets, cross-chain testing
-- **Test Result Reporting**: Reporting overview and vulnerability categorization
-- **Guides**: Real wallet integration and community test examples
+## Adding New Documentation
+
+1. Create new `.md` files in the `docs` directory
+2. Update `sidebars.js` to include your new document
+3. Link to your document from other relevant pages
 
 ## Contributing to Documentation
 
@@ -71,4 +78,4 @@ The documentation is organized into the following sections:
 - Include code examples where appropriate
 - Add cross-references to related documentation
 - Use proper Markdown formatting
-- Include images and diagrams when helpful 
+- Include images and diagrams when helpful

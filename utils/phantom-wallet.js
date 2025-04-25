@@ -21,22 +21,27 @@ async function setupPhantomWallet(page, options = {}) {
   const accountName = options.accountName || 'Test Wallet'
 
   // Inject Phantom mock if in test environment
-  await page.evaluate((network) => {
+  await page.evaluate(network => {
     // Create a mock Phantom provider if not already available
     if (!window.solana) {
       console.log(`Creating mock Phantom provider (${network})`)
 
       // Create test account keys
       const testAccount = {
-        publicKey: new Uint8Array([3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+        publicKey: new Uint8Array([
+          3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0,
+        ]),
         secretKey: new Uint8Array(64).fill(1),
       }
 
       // Convert public key to base58 for display
+      // eslint-disable-next-line no-inner-declarations
       function toBase58(arr) {
         const alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
         const base = alphabet.length
-        let carry; const digits = [0]
+        let carry
+        const digits = [0]
 
         for (let i = 0; i < arr.length; i++) {
           carry = arr[i]
@@ -101,7 +106,7 @@ async function setupPhantomWallet(page, options = {}) {
           }
 
           return true
-        }
+        },
       }
 
       // Dispatch connect event for dApps that listen for it
@@ -135,12 +140,16 @@ async function connectPhantomWallet(page) {
     console.log('Phantom popup detected, handling connection approval')
 
     // Click the "Connect" or "Approve" button in the popup
-    await popup.locator('button:has-text("Connect"), button:has-text("Approve"), button:has-text("Confirm")').first()
+    await popup
+      .locator('button:has-text("Connect"), button:has-text("Approve"), button:has-text("Confirm")')
+      .first()
       .click({ timeout: 10000 })
-      .catch(async (err) => {
+      .catch(async err => {
         console.log('Error finding connect button in popup:', err)
         // Try common fallback elements
-        await popup.locator('.connect-button, .approve-button, .confirm-button').first()
+        await popup
+          .locator('.connect-button, .approve-button, .confirm-button')
+          .first()
           .click({ timeout: 5000 })
           .catch(() => {
             console.log('Failed to find any connect button, trying to press Enter key')
@@ -157,7 +166,8 @@ async function connectPhantomWallet(page) {
     console.log('No popup detected, assuming in-page connection flow')
 
     // Try to handle in-page connection dialog
-    await page.locator('.phantom-connect-button, button:has-text("Connect"), button:has-text("Approve")')
+    await page
+      .locator('.phantom-connect-button, button:has-text("Connect"), button:has-text("Approve")')
       .first()
       .click({ timeout: 5000 })
       .catch(() => {
@@ -169,9 +179,11 @@ async function connectPhantomWallet(page) {
   await page.waitForTimeout(2000)
 
   // Get the connected account address if possible
-  const connectedAddress = await page.evaluate(() => {
-    return window.solana?.publicKey?.toString() || ''
-  }).catch(() => '')
+  const connectedAddress = await page
+    .evaluate(() => {
+      return window.solana?.publicKey?.toString() || ''
+    })
+    .catch(() => '')
 
   console.log(`Connected with Phantom address: ${connectedAddress}`)
 
@@ -187,21 +199,27 @@ async function disconnectPhantomWallet(page) {
   console.log('Disconnecting Phantom wallet...')
 
   // Look for disconnect button in common locations
-  const disconnectButton = page.locator('[data-testid="disconnect-button"], button:has-text("Disconnect"), .disconnect-button').first()
+  const disconnectButton = page
+    .locator('[data-testid="disconnect-button"], button:has-text("Disconnect"), .disconnect-button')
+    .first()
 
   // Click disconnect if found
   await disconnectButton.click({ timeout: 5000 }).catch(async () => {
     console.log('Disconnect button not found in main UI, trying wallet dropdown')
 
     // Try clicking wallet address/icon first to show dropdown
-    await page.locator('[data-testid="wallet-button"], .wallet-button, .account-button').first()
+    await page
+      .locator('[data-testid="wallet-button"], .wallet-button, .account-button')
+      .first()
       .click({ timeout: 5000 })
       .catch(() => {
         console.log('Wallet button not found, trying alternative disconnect method')
       })
 
     // Now try to find disconnect in dropdown
-    await page.locator('text=Disconnect, button:has-text("Disconnect")').first()
+    await page
+      .locator('text=Disconnect, button:has-text("Disconnect")')
+      .first()
       .click({ timeout: 5000 })
       .catch(async () => {
         console.log('Still no disconnect option found, trying programmatic disconnect')
@@ -243,13 +261,19 @@ async function approvePhantomTransaction(page) {
     await popup.waitForLoadState('networkidle')
 
     // Look for transaction details if needed
-    txHash = await popup.locator('.transaction-hash, [data-testid="tx-hash"]').textContent().catch(() => '')
+    txHash = await popup
+      .locator('.transaction-hash, [data-testid="tx-hash"]')
+      .textContent()
+      .catch(() => '')
 
     // Click the approve button
-    await popup.locator('button:has-text("Approve"), button:has-text("Confirm"), button:has-text("Sign"), .approve-button, .confirm-button, .sign-button')
+    await popup
+      .locator(
+        'button:has-text("Approve"), button:has-text("Confirm"), button:has-text("Sign"), .approve-button, .confirm-button, .sign-button'
+      )
       .first()
       .click({ timeout: 10000 })
-      .catch(async (err) => {
+      .catch(async err => {
         console.log('Error finding approve button:', err)
         // Try fallback approach - press Enter key
         await popup.keyboard.press('Enter')
@@ -263,19 +287,24 @@ async function approvePhantomTransaction(page) {
     // If no popup, look for in-page approval elements
     console.log('No transaction popup detected, looking for in-page approval')
 
-    await page.locator('button:has-text("Approve"), button:has-text("Confirm"), button:has-text("Sign"), .approve-button, .confirm-button')
+    await page
+      .locator(
+        'button:has-text("Approve"), button:has-text("Confirm"), button:has-text("Sign"), .approve-button, .confirm-button'
+      )
       .first()
       .click({ timeout: 5000 })
       .catch(async () => {
         console.log('No in-page approve button found, trying programmatic approval')
 
         // Try programmatic approval as fallback
-        txHash = await page.evaluate(() => {
-          if (window.solana && window.solana._handlePendingTransaction) {
-            return window.solana._handlePendingTransaction('approve')
-          }
-          return ''
-        }).catch(() => '')
+        txHash = await page
+          .evaluate(() => {
+            if (window.solana && window.solana._handlePendingTransaction) {
+              return window.solana._handlePendingTransaction('approve')
+            }
+            return ''
+          })
+          .catch(() => '')
       })
   }
 
@@ -305,7 +334,7 @@ async function setupPhantomWalletState(page, options = {}) {
       isConnected: window.solana?.isConnected || false,
       publicKey: window.solana?.publicKey?.toString() || '',
       network: window.solana?.network || 'devnet',
-      autoApprove: window.solana?.autoApprove || false
+      autoApprove: window.solana?.autoApprove || false,
     }
   })
 
@@ -313,7 +342,7 @@ async function setupPhantomWalletState(page, options = {}) {
   return {
     ...state,
     ...options,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   }
 }
 
@@ -329,14 +358,14 @@ async function savePhantomWalletState(page, customData = {}) {
       isConnected: window.solana?.isConnected || false,
       publicKey: window.solana?.publicKey?.toString() || '',
       network: window.solana?.network || 'devnet',
-      autoApprove: window.solana?.autoApprove || false
+      autoApprove: window.solana?.autoApprove || false,
     }
   })
 
   return {
     ...state,
     ...customData,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   }
 }
 
@@ -347,7 +376,7 @@ async function savePhantomWalletState(page, customData = {}) {
  * @returns {Promise<void>}
  */
 async function restorePhantomWalletState(page, state) {
-  await page.evaluate((state) => {
+  await page.evaluate(state => {
     if (!window.solana) {
       console.error('Cannot restore Phantom wallet state: window.solana is not defined')
       return false
@@ -365,7 +394,9 @@ async function restorePhantomWalletState(page, state) {
 
     // Dispatch appropriate events
     if (state.isConnected) {
-      window.dispatchEvent(new CustomEvent('solana#connect', { detail: { publicKey: window.solana.publicKey } }))
+      window.dispatchEvent(
+        new CustomEvent('solana#connect', { detail: { publicKey: window.solana.publicKey } })
+      )
     }
 
     return true
@@ -384,5 +415,5 @@ module.exports = {
   approvePhantomTransaction,
   setupPhantomWalletState,
   savePhantomWalletState,
-  restorePhantomWalletState
+  restorePhantomWalletState,
 }

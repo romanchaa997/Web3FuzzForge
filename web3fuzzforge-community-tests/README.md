@@ -54,11 +54,13 @@ We welcome contributions from the community! Here's how you can contribute:
 ### Creating a New Test
 
 1. Create a new test file in the appropriate directory:
+
    - `dapp-tests/wallet-connection/` for wallet connection tests
    - `dapp-tests/transaction-flow/` for transaction tests
    - Create a new directory if your test doesn't fit existing categories
 
 2. Follow the template format:
+
    ```javascript
    /**
     * Test case description: Descriptive name of your test
