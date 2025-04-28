@@ -1,7 +1,7 @@
 const vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
-const { exec } = require('child_process');
+const { exec, execSync } = require('child_process');
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -121,7 +121,17 @@ function activate(context) {
         panel.webview.html = getHelpWebviewContent();
     });
 
-    context.subscriptions.push(generateTemplateCommand, showHelpCommand);
+    // Register one-click generate command and create UI button
+    registerOneClickTestGeneration(context);
+
+    // Create status bar button for quick access
+    const oneClickButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+    oneClickButton.text = "$(shield) Generate Web3 Test";
+    oneClickButton.command = 'web3fuzzforge.oneClickGenerate';
+    oneClickButton.tooltip = 'Generate a Web3FuzzForge test template with one click';
+    oneClickButton.show();
+
+    context.subscriptions.push(generateTemplateCommand, showHelpCommand, oneClickButton);
 
     // Register hover provider for inline help
     const hoverProvider = vscode.languages.registerHoverProvider(['javascript', 'typescript'], {
@@ -290,6 +300,92 @@ test('Sign a transaction with MetaMask', async ({ page }) => {
 }
 
 function deactivate() {}
+
+// Add this function to handle one-click test generation
+function registerOneClickTestGeneration(context) {
+    // Register the command for one-click test generation
+    const oneClickCmd = vscode.commands.registerCommand('web3fuzzforge.oneClickGenerate', async () => {
+        try {
+            // Get workspace folders
+            const workspaceFolders = vscode.workspace.workspaceFolders;
+            if (!workspaceFolders) {
+                vscode.window.showErrorMessage('No workspace folder found. Please open a project folder first.');
+                return;
+            }
+            
+            const rootPath = workspaceFolders[0].uri.fsPath;
+            
+            // Create tests directory if it doesn't exist
+            const testsDir = path.join(rootPath, 'tests');
+            if (!fs.existsSync(testsDir)) {
+                fs.mkdirSync(testsDir, { recursive: true });
+            }
+            
+            // Show test type selection
+            const testType = await vscode.window.showQuickPick(
+                [
+                    { label: 'Connection Test', value: 'connect' },
+                    { label: 'Transaction Test', value: 'tx' },
+                    { label: 'Security Fuzzing Test', value: 'tx', fuzz: true }
+                ],
+                { placeHolder: 'Select test type to generate' }
+            );
+            
+            if (!testType) return;
+            
+            // Show wallet selection
+            const wallet = await vscode.window.showQuickPick(
+                [
+                    { label: 'MetaMask', value: 'metamask' },
+                    { label: 'Coinbase', value: 'coinbase' },
+                    { label: 'Phantom', value: 'phantom' },
+                    { label: 'WalletConnect', value: 'walletconnect' }
+                ],
+                { placeHolder: 'Select wallet to test with' }
+            );
+            
+            if (!wallet) return;
+            
+            // Generate a filename based on the test type
+            const filename = `${testType.value}-${wallet.value}-test.js`;
+            const outputPath = path.join(testsDir, filename);
+            
+            // Build the command
+            let command = `npx web3fuzzforge generate ${testType.value} --wallet ${wallet.value} --out ${outputPath}`;
+            
+            // Add fuzz flag if needed
+            if (testType.fuzz) {
+                command += ' --fuzz';
+            }
+            
+            // Show status
+            vscode.window.withProgress({
+                location: vscode.ProgressLocation.Notification,
+                title: 'Generating Web3FuzzForge test',
+                cancellable: false
+            }, async (progress) => {
+                progress.report({ message: 'Generating test template...' });
+                
+                try {
+                    // Execute the command
+                    execSync(command, { cwd: rootPath });
+                    
+                    // Open the generated file
+                    const document = await vscode.workspace.openTextDocument(outputPath);
+                    vscode.window.showTextDocument(document);
+                    
+                    vscode.window.showInformationMessage(`Test template generated at ${filename}`);
+                } catch (error) {
+                    vscode.window.showErrorMessage(`Failed to generate test: ${error.message}`);
+                }
+            });
+        } catch (error) {
+            vscode.window.showErrorMessage(`Error: ${error.message}`);
+        }
+    });
+    
+    context.subscriptions.push(oneClickCmd);
+}
 
 module.exports = {
     activate,

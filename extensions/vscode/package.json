@@ -2,7 +2,7 @@
   "name": "web3fuzzforge-vscode",
   "displayName": "Web3FuzzForge",
   "description": "VS Code extension for Web3FuzzForge test template generation and helpers",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "web3fuzzforge",
   "engines": {
     "vscode": "^1.60.0"
@@ -14,6 +14,7 @@
   ],
   "activationEvents": [
     "onCommand:web3fuzzforge.generateTemplate",
+    "onCommand:web3fuzzforge.oneClickGenerate",
     "onLanguage:javascript",
     "onLanguage:typescript"
   ],
@@ -27,6 +28,10 @@
       {
         "command": "web3fuzzforge.showHelp",
         "title": "Web3FuzzForge: Show Help"
+      },
+      {
+        "command": "web3fuzzforge.oneClickGenerate",
+        "title": "Web3FuzzForge: One-Click Test Generation"
       }
     ],
     "snippets": [
@@ -79,5 +84,10 @@
   },
   "dependencies": {
     "vscode-languageclient": "^8.0.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/romanchaa997/Web3FuzzForge"
+  },
+  "icon": "web3fuzzforge-icon.png"
 } 

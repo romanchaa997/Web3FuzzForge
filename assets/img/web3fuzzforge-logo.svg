@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shield Background -->
+  <path d="M100 10L25 40V110C25 150 100 190 100 190C100 190 175 150 175 110V40L100 10Z" fill="#2E3A59"/>
+  <path d="M100 20L35 45V105C35 140 100 175 100 175C100 175 165 140 165 105V45L100 20Z" fill="#3E4D6A"/>
+  
+  <!-- Web3 Symbol -->
+  <path d="M60 80L80 120M80 80L60 120M100 80V120M120 80L140 120M140 80L120 120" stroke="#00BFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Forge/Hammer Symbol -->
+  <rect x="85" y="50" width="30" height="15" rx="2" fill="#FFD700"/>
+  <rect x="95" y="35" width="10" height="30" rx="2" fill="#FFD700"/>
+  
+  <!-- Security Lock Symbol -->
+  <circle cx="100" cy="140" r="15" fill="#4CAF50"/>
+  <rect x="95" y="135" width="10" height="15" rx="2" fill="#2E3A59"/>
+</svg> 

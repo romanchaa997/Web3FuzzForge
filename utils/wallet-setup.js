@@ -6,7 +6,8 @@
  */
 
 const { chromium } = require('@playwright/test');
-const dappeteer = require('@chainsafe/dappeteer');
+// Use the secure wrapper instead of directly importing dappeteer
+const dappeteer = require('../src/utils/dappeteer-wrapper');
 
 /**
  * Sets up MetaMask extension and initializes it for testing
@@ -26,8 +27,8 @@ async function setupMetaMask(browser, options = {}) {
   };
 
   try {
-    // Simulate MetaMask extension using dappeteer
-    const metamask = await dappeteer.initializeMetaMask(
+    // Use bootstrap method from dappeteer wrapper instead of initializeMetaMask
+    const { metaMask } = await dappeteer.bootstrap(
       browser,
       {
         seed: process.env.TEST_WALLET_SEED || 'test test test test test test test test test test test junk',
@@ -40,7 +41,7 @@ async function setupMetaMask(browser, options = {}) {
     const eventHandlers = {};
     
     const enhancedMetamask = {
-      ...metamask,
+      ...metaMask,
       
       // Event handling
       on: (event, handler) => {
@@ -69,7 +70,7 @@ async function setupMetaMask(browser, options = {}) {
         }
         
         // Confirm the transaction
-        await metamask.confirmTransaction();
+        await metaMask.confirmTransaction();
         
         // Emit transaction event
         if (opts.monitorAllRequests) {
@@ -83,7 +84,7 @@ async function setupMetaMask(browser, options = {}) {
       
       // Reject transaction with monitoring
       rejectTransaction: async () => {
-        await metamask.rejectTransaction();
+        await metaMask.rejectTransaction();
         
         if (opts.monitorAllRequests) {
           enhancedMetamask.emit('transaction', { 
@@ -106,7 +107,7 @@ async function setupMetaMask(browser, options = {}) {
         }
         
         // Confirm the signature
-        await metamask.confirmSignatureRequest();
+        await metaMask.confirmSignatureRequest();
         
         if (opts.monitorAllRequests) {
           enhancedMetamask.emit('signature', { 
@@ -119,7 +120,7 @@ async function setupMetaMask(browser, options = {}) {
       
       // Reject signature with monitoring
       rejectSignature: async () => {
-        await metamask.rejectSignatureRequest();
+        await metaMask.rejectSignatureRequest();
         
         if (opts.monitorAllRequests) {
           enhancedMetamask.emit('signature', { 
@@ -249,5 +250,7 @@ function checkSignatureSecurity(sigDetails) {
 
 module.exports = {
   setupMetaMask,
-  connectWallet
+  connectWallet,
+  checkTransactionSecurity,
+  checkSignatureSecurity
 }; 

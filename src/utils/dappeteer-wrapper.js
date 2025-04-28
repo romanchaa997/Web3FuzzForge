@@ -40,12 +40,44 @@ async function safeBootstrap(browser, options = {}) {
     return result;
   } catch (error) {
     // Provide more helpful error messages
-    console.error('Error bootstrapping wallet:', error.message);
-    if (error.message.includes('TimeoutError')) {
+    console.error('Error bootstrapping wallet:', error.message || 'Unknown error');
+    
+    // Check if the error message contains a specific string (with null/undefined check)
+    if (error.message && error.message.includes('TimeoutError')) {
       console.error('Timeout error: Check if wallet extension installed correctly');
     }
+    
+    // Fall back to a mock implementation for testing
+    if (options.mockOnFailure) {
+      console.warn('Falling back to mock wallet implementation');
+      return createMockWallet();
+    }
+    
     throw error;
   }
+}
+
+/**
+ * Creates a mock wallet implementation for testing when the real extension fails
+ * @returns {Object} - Mock wallet object
+ */
+function createMockWallet() {
+  const mockMetaMask = {
+    approve: async () => console.log('Mock: approve() called'),
+    reject: async () => console.log('Mock: reject() called'),
+    confirmTransaction: async () => console.log('Mock: confirmTransaction() called'),
+    rejectTransaction: async () => console.log('Mock: rejectTransaction() called'),
+    confirmSignatureRequest: async () => console.log('Mock: confirmSignatureRequest() called'),
+    rejectSignatureRequest: async () => console.log('Mock: rejectSignatureRequest() called'),
+    switchNetwork: async (network) => console.log(`Mock: switchNetwork(${network}) called`),
+    addNetwork: async (network) => console.log(`Mock: addNetwork(${JSON.stringify(network)}) called`),
+    importPK: async (privateKey) => console.log('Mock: importPK() called'),
+    lock: async () => console.log('Mock: lock() called'),
+    unlock: async (password) => console.log('Mock: unlock() called'),
+    isMock: true
+  };
+  
+  return { metaMask: mockMetaMask, wallet: mockMetaMask };
 }
 
 /**
@@ -72,4 +104,5 @@ module.exports = {
   bootstrap: safeBootstrap,
   // Add new safety utilities
   isSecureWalletConnection,
+  createMockWallet
 };

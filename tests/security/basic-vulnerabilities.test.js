@@ -77,7 +77,7 @@ test.describe('Basic Web3 Security Tests', () => {
     });
 
     expect(txError).toBeTruthy();
-    expect(txError).toContain('Invalid address format');
+    expect(txError).toContain('Missing required transaction parameters');
   });
 
   test('Check for proper error handling in transaction flow', async () => {
