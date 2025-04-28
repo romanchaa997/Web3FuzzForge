@@ -115,15 +115,16 @@ async function saveSimpleWalletState(page, customData = {}) {
       customData,
     }
 
+    // Initialize ethereum object if it doesn't exist
     if (!window.ethereum) {
-      console.error('No wallet detected, using default state')
-      return defaultState
+      window.ethereum = defaultState;
+      console.log('Created mock ethereum object with default state');
     }
 
-    return {
-      selectedAddress: window.ethereum?.selectedAddress || defaultState.selectedAddress,
-      chainId: window.ethereum?.chainId || defaultState.chainId,
-      networkVersion: window.ethereum?.networkVersion || defaultState.networkVersion,
+    const state = {
+      selectedAddress: window.ethereum.selectedAddress || defaultState.selectedAddress,
+      chainId: window.ethereum.chainId || defaultState.chainId,
+      networkVersion: window.ethereum.networkVersion || defaultState.networkVersion,
       // Save any UI state that might be needed
       uiState: {
         walletInfoVisible: document.getElementById('wallet-info')?.style.display !== 'none',
@@ -131,6 +132,13 @@ async function saveSimpleWalletState(page, customData = {}) {
       // Store any custom data that was provided
       customData: customData || {},
     }
+
+    // Ensure the ethereum object has these properties set
+    window.ethereum.selectedAddress = state.selectedAddress;
+    window.ethereum.chainId = state.chainId;
+    window.ethereum.networkVersion = state.networkVersion;
+
+    return state;
   }, customData)
 
   // Add additional properties that might be needed
@@ -145,71 +153,74 @@ async function restoreSimpleWalletState(page, state) {
     throw new Error('Cannot restore null or undefined wallet state')
   }
 
-  await page.evaluate(state => {
-    if (window.ethereum) {
-      window.ethereum.selectedAddress = state.selectedAddress
-      window.ethereum.chainId = state.chainId
-      window.ethereum.networkVersion = state.networkVersion
+  const restoredState = await page.evaluate(state => {
+    // Initialize ethereum object if it doesn't exist
+    if (!window.ethereum) {
+      window.ethereum = {};
+    }
 
-      // Important: Update the UI elements to reflect the restored state
-      updateUI()
+    // Set the properties on window.ethereum
+    window.ethereum.selectedAddress = state.selectedAddress;
+    window.ethereum.chainId = state.chainId;
+    window.ethereum.networkVersion = state.networkVersion;
 
-      function updateUI() {
-        // Force wallet info display
-        const walletInfo = document.getElementById('wallet-info')
-        if (walletInfo) {
-          walletInfo.style.display = state.selectedAddress ? 'block' : 'none'
-        }
-
-        // Force update wallet address
-        const walletAddressEl = document.querySelector('.wallet-address')
-        if (walletAddressEl && state.selectedAddress) {
-          walletAddressEl.textContent = state.selectedAddress
-        }
-
-        // Update network name
-        const networkNames = {
-          '0x1': 'Ethereum Mainnet',
-          '0x5': 'Goerli Testnet',
-          '0x89': 'Polygon Mainnet',
-        }
-
-        const networkNameEl = document.getElementById('network-name')
-        if (networkNameEl) {
-          networkNameEl.textContent = networkNames[state.chainId] || `Chain ID: ${state.chainId}`
-        }
-
-        // Handle transaction UI if present in customData
-        if (state.customData && state.customData.transactionStatus === 'post-transaction') {
-          const txConfirmation = document.getElementById('tx-confirmation')
-          if (txConfirmation) {
-            txConfirmation.style.display = 'block'
-          }
-
-          const txHash = document.getElementById('tx-hash')
-          if (txHash && state.customData.txHash) {
-            txHash.textContent = state.customData.txHash
-          }
-        } else if (state.customData && state.customData.transactionStatus === 'pre-transaction') {
-          const txConfirmation = document.getElementById('tx-confirmation')
-          if (txConfirmation) {
-            txConfirmation.style.display = 'none'
-          }
-        }
+    // Important: Update the UI elements to reflect the restored state
+    function updateUI() {
+      // Force wallet info display
+      const walletInfo = document.getElementById('wallet-info')
+      if (walletInfo) {
+        walletInfo.style.display = state.uiState.walletInfoVisible ? 'block' : 'none'
       }
 
-      // Restore any custom data
-      if (state.customData) {
-        window.ethereum.customData = state.customData
+      // Force update wallet address
+      const walletAddressEl = document.querySelector('.wallet-address')
+      if (walletAddressEl) {
+        walletAddressEl.textContent = state.selectedAddress
+      }
+
+      // Update network name
+      const networkNames = {
+        '0x1': 'Ethereum Mainnet',
+        '0x5': 'Goerli Testnet',
+        '0x89': 'Polygon Mainnet',
+      }
+
+      const networkNameEl = document.getElementById('network-name')
+      if (networkNameEl) {
+        networkNameEl.textContent = networkNames[state.chainId] || `Chain ID: ${state.chainId}`
+      }
+
+      // Handle transaction UI if present in customData
+      if (state.customData && state.customData.transactionStatus === 'post-transaction') {
+        const txConfirmation = document.getElementById('tx-confirmation')
+        if (txConfirmation) {
+          txConfirmation.style.display = 'block'
+        }
+
+        const txHash = document.getElementById('tx-hash')
+        if (txHash && state.customData.txHash) {
+          txHash.textContent = state.customData.txHash
+        }
       }
     }
+
+    updateUI();
+
+    // Return the current state for verification
+    return {
+      address: window.ethereum.selectedAddress,
+      chainId: window.ethereum.chainId,
+      networkVersion: window.ethereum.networkVersion
+    };
   }, state)
 
   // Wait for UI to update
-  await page.waitForTimeout(300)
+  await page.waitForTimeout(500)
 
   // Force UI update if elements aren't visible
   await forceShowWalletUI(page)
+
+  return restoredState;
 }
 
 // Alternative approach for connecting wallet without relying on UI
@@ -439,21 +450,42 @@ test.describe('Wallet State Snapshot Demo', () => {
     // Use direct setup
     await setupWalletDirectly(page)
 
-    // Directly set the wallet UI for mainnet
+    // Initialize ethereum object and set mainnet state
     await page.evaluate(() => {
+      // Ensure ethereum object exists
+      if (!window.ethereum) {
+        window.ethereum = {
+          selectedAddress: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+          chainId: '0x1',
+          networkVersion: '1',
+          isMetaMask: true
+        };
+      }
+
+      // Set initial mainnet state
+      window.ethereum.selectedAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
+      window.ethereum.chainId = '0x1';
+      window.ethereum.networkVersion = '1';
+
+      // Update UI
       const walletAddressEl = document.querySelector('.wallet-address')
       if (walletAddressEl) {
-        walletAddressEl.textContent = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+        walletAddressEl.textContent = window.ethereum.selectedAddress;
       }
       const networkNameEl = document.getElementById('network-name')
       if (networkNameEl) {
-        networkNameEl.textContent = 'Ethereum Mainnet'
+        networkNameEl.textContent = 'Ethereum Mainnet';
       }
-      window.ethereum.chainId = '0x1'
-      window.ethereum.networkVersion = '1'
-    })
+      const walletInfo = document.getElementById('wallet-info')
+      if (walletInfo) {
+        walletInfo.style.display = 'block';
+      }
+    });
 
-    // Verify we're on Ethereum mainnet via direct DOM evaluation
+    // Wait for UI updates
+    await page.waitForTimeout(500);
+
+    // Verify we're on Ethereum mainnet
     const initialNetwork = await page.evaluate(() => {
       return {
         chainId: window.ethereum?.chainId,
@@ -461,22 +493,27 @@ test.describe('Wallet State Snapshot Demo', () => {
       }
     })
     console.log('Initial network:', initialNetwork)
+    expect(initialNetwork.chainId).toBe('0x1');
+    expect(initialNetwork.networkName).toBe('Ethereum Mainnet');
 
     // Save the current state
     const mainnetState = await saveSimpleWalletState(page)
 
-    // Directly switch to Polygon
+    // Switch to Polygon
     await page.evaluate(() => {
-      window.ethereum.chainId = '0x89'
-      window.ethereum.networkVersion = '137'
+      // Ensure ethereum object exists before switching
+      if (window.ethereum) {
+        window.ethereum.chainId = '0x89';
+        window.ethereum.networkVersion = '137';
 
-      const networkNameEl = document.getElementById('network-name')
-      if (networkNameEl) {
-        networkNameEl.textContent = 'Polygon Mainnet'
+        const networkNameEl = document.getElementById('network-name')
+        if (networkNameEl) {
+          networkNameEl.textContent = 'Polygon Mainnet';
+        }
       }
-    })
+    });
 
-    // Verify the network changed to Polygon via direct DOM evaluation
+    // Verify the network changed to Polygon
     const polygonNetwork = await page.evaluate(() => {
       return {
         chainId: window.ethereum?.chainId,
@@ -484,6 +521,8 @@ test.describe('Wallet State Snapshot Demo', () => {
       }
     })
     console.log('Polygon network:', polygonNetwork)
+    expect(polygonNetwork.chainId).toBe('0x89');
+    expect(polygonNetwork.networkName).toBe('Polygon Mainnet');
 
     // Save polygon state
     const polygonState = await saveSimpleWalletState(page)
@@ -491,7 +530,10 @@ test.describe('Wallet State Snapshot Demo', () => {
     // Restore mainnet state
     await restoreSimpleWalletState(page, mainnetState)
 
-    // Verify we're back on Ethereum via direct DOM evaluation
+    // Wait for UI updates
+    await page.waitForTimeout(500);
+
+    // Verify we're back on Ethereum
     const restoredNetwork = await page.evaluate(() => {
       return {
         chainId: window.ethereum?.chainId,
@@ -499,6 +541,8 @@ test.describe('Wallet State Snapshot Demo', () => {
       }
     })
     console.log('Restored network:', restoredNetwork)
+    expect(restoredNetwork.chainId).toBe('0x1');
+    expect(restoredNetwork.networkName).toBe('Ethereum Mainnet');
   })
 
   test('Use wallet state to test transaction flows', async () => {

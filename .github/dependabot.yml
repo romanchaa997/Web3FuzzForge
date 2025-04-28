@@ -1,0 +1,44 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    # Look for npm dependencies in the root directory
+    directory: "/"
+    # Check for updates once a week (Monday)
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    # Set security updates to a high priority
+    security-updates-only: true
+    labels:
+      - "npm dependencies"
+      - "security"
+    # Set version strategy
+    versioning-strategy: increase
+    # Group all dev dependencies
+    groups:
+      development-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      production-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+    # Limit the number of open pull requests
+    open-pull-requests-limit: 10
+    # Assign reviewers for pull requests
+    reviewers:
+      - "web3-security-team"
+    
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "github-actions"
+      - "dependencies" 

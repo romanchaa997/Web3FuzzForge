@@ -1,0 +1,137 @@
+{
+  "Wallet Connection Test": {
+    "prefix": "w3ff-connect",
+    "body": [
+      "import { test, expect } from '@playwright/test';",
+      "import { setupMetaMask, connectWallet, WalletInstance } from 'web3fuzzforge';",
+      "",
+      "test('Connect ${1:MetaMask} wallet to dApp', async ({ page }) => {",
+      "  await page.goto('${2:http://localhost:3000}');",
+      "  ",
+      "  // Setup wallet with a testing account",
+      "  const wallet: WalletInstance = await setup${1:MetaMask}();",
+      "  ",
+      "  // Connect wallet to dApp",
+      "  await connectWallet(page, wallet);",
+      "  ",
+      "  // Verify connection was successful",
+      "  await expect(page.locator('${3:.wallet-address}')).toBeVisible();",
+      "  $0",
+      "});"
+    ],
+    "description": "Create a wallet connection test"
+  },
+  "Transaction Signing Test": {
+    "prefix": "w3ff-tx",
+    "body": [
+      "import { test, expect } from '@playwright/test';",
+      "import { setup${1:MetaMask}, connectWallet, approveTransaction, WalletInstance } from 'web3fuzzforge';",
+      "",
+      "test('Sign a transaction with ${1:MetaMask}', async ({ page }) => {",
+      "  await page.goto('${2:http://localhost:3000}');",
+      "  ",
+      "  // Setup and connect wallet",
+      "  const wallet: WalletInstance = await setup${1:MetaMask}();",
+      "  await connectWallet(page, wallet);",
+      "  ",
+      "  // Interact with dApp to trigger a transaction",
+      "  await page.locator('${3:#send-tx-button}').click();",
+      "  ",
+      "  // Approve the transaction in wallet",
+      "  await approveTransaction(wallet);",
+      "  ",
+      "  // Verify transaction was processed",
+      "  await expect(page.locator('${4:.tx-success}')).toBeVisible();",
+      "  $0",
+      "});"
+    ],
+    "description": "Create a transaction signing test"
+  },
+  "Network Switching Test": {
+    "prefix": "w3ff-network",
+    "body": [
+      "import { test, expect } from '@playwright/test';",
+      "import { setup${1:MetaMask}, connectWallet, switchNetwork, WalletInstance, NetworkType } from 'web3fuzzforge';",
+      "",
+      "test('Switch network in ${1:MetaMask}', async ({ page }) => {",
+      "  await page.goto('${2:http://localhost:3000}');",
+      "  ",
+      "  // Setup and connect wallet",
+      "  const wallet: WalletInstance = await setup${1:MetaMask}();",
+      "  await connectWallet(page, wallet);",
+      "  ",
+      "  // Switch to a different network",
+      "  await switchNetwork(wallet, '${3:goerli}' as NetworkType);",
+      "  ",
+      "  // Verify network was switched in the dApp",
+      "  await expect(page.locator('${4:.network-indicator}')).toHaveText(/.*${3:Goerli}.*/);",
+      "  $0",
+      "});"
+    ],
+    "description": "Create a network switching test"
+  },
+  "Security Test": {
+    "prefix": "w3ff-security",
+    "body": [
+      "import { test, expect } from '@playwright/test';",
+      "import { setup${1:MetaMask}, connectWallet, securityTest, WalletInstance, SecurityTestResult } from 'web3fuzzforge';",
+      "",
+      "test('Security test: ${2:permission validation}', async ({ page }) => {",
+      "  await page.goto('${3:http://localhost:3000}');",
+      "  ",
+      "  // Setup and connect wallet",
+      "  const wallet: WalletInstance = await setup${1:MetaMask}();",
+      "  await connectWallet(page, wallet);",
+      "  ",
+      "  // Create security test instance",
+      "  const security = securityTest('${2:permission-validation}');",
+      "  ",
+      "  // Run security test",
+      "  const result: SecurityTestResult = await security.run(page, wallet, {",
+      "    target: '${4:#action-button}',",
+      "    steps: ${5:[]}",
+      "  });",
+      "  ",
+      "  // Verify no vulnerabilities were found",
+      "  expect(result.vulnerabilities).toHaveLength(0);",
+      "  $0",
+      "});"
+    ],
+    "description": "Create a security test"
+  },
+  "Wallet State Assertions": {
+    "prefix": "w3ff-expect",
+    "body": [
+      "// Verify wallet state",
+      "const walletState = await getWalletState(${1:wallet});",
+      "expect(walletState.isConnected).toBe(true);",
+      "expect(walletState.accounts).toContain('${2:0x...}');",
+      "expect(walletState.chainId).toBe('${3:0x1}');",
+      "expect(walletState.balance).toBeGreaterThan(${4:0});",
+      "$0"
+    ],
+    "description": "Insert wallet state assertions"
+  },
+  "Type Definitions": {
+    "prefix": "w3ff-types",
+    "body": [
+      "interface WalletState {",
+      "  isConnected: boolean;",
+      "  accounts: string[];",
+      "  chainId: string;",
+      "  balance: number;",
+      "  provider: any;",
+      "}",
+      "",
+      "interface TestOptions {",
+      "  timeout?: number;",
+      "  screenshots?: boolean;",
+      "  failOnError?: boolean;",
+      "  retries?: number;",
+      "}",
+      "",
+      "$0"
+    ],
+    "description": "Insert Web3FuzzForge type definitions"
+  }
+} 

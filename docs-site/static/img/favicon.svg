@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="gradientFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3778FF" />
+      <stop offset="100%" stop-color="#6147FF" />
+    </linearGradient>
+  </defs>
+  <!-- Shield base (simplified) -->
+  <path d="M50 10L85 20V45C85 65 70 80 50 90C30 80 15 65 15 45V20L50 10Z" fill="url(#gradientFill)" />
+  <!-- Lock symbol (simplified) -->
+  <rect x="40" y="45" width="20" height="20" rx="3" fill="white" />
+  <path d="M42 45V40C42 35 45 30 50 30C55 30 58 35 58 40V45" stroke="white" stroke-width="4" fill="none" />
+  <circle cx="50" cy="55" r="4" fill="url(#gradientFill)" />
+</svg> 

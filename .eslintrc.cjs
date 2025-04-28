@@ -6,16 +6,23 @@ module.exports = {
   },
   extends: [
     'standard',
-    'eslint:recommended'
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:prettier/recommended'
   ],
+  plugins: [
+    '@typescript-eslint',
+    'prettier'
+  ],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 'latest',
-    sourceType: 'module'
+    sourceType: 'module',
+    project: './tsconfig.json'
   },
   overrides: [
     {
       files: ['*.ts', '*.tsx'],
-      parser: '@typescript-eslint/parser',
       extends: [
         'plugin:@typescript-eslint/recommended'
       ],
@@ -27,7 +34,7 @@ module.exports = {
     }
   ],
   rules: {
-    'no-unused-vars': 'warn',
+    'no-unused-vars': 'off',
     'no-console': 'off',
     'comma-dangle': ['error', 'only-multiline'],
     'space-before-function-paren': ['error', {
@@ -35,7 +42,7 @@ module.exports = {
       named: 'never',
       asyncArrow: 'always'
     }],
-    // Turn off or downgrade rules causing many errors
+    'prettier/prettier': 'error',
     'eqeqeq': 'warn',
     'no-sequences': 'warn',
     'no-unused-expressions': 'warn',

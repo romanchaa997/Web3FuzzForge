@@ -1,10 +1,13 @@
-name: Security Checklist Scan
+name: Security Scan and Vulnerability Monitoring
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  # Run daily to catch new vulnerabilities
+  schedule:
+    - cron: '0 0 * * *'
   # Allow manual triggering
   workflow_dispatch:
 
@@ -35,9 +38,31 @@ jobs:
             npm ci
           fi
           
+      - name: Run NPM audit
+        run: |
+          npm audit --json > npm-audit.json || true
+          echo "NPM audit completed - results saved to npm-audit.json"
+          
       - name: Run checklist scanner
         run: |
           bash ./automation/scan-contracts.sh
+
+      - name: Check dappeteer dependencies specifically
+        run: |
+          echo "Checking @chainsafe/dappeteer dependencies..."
+          npm list @chainsafe/dappeteer --json > dappeteer-deps.json || true
+      
+      - name: Run custom dependency security check
+        run: |
+          node utils/dependency-check.js --ci > dependency-check.log
+          
+      - name: Install and run Snyk
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        if: env.SNYK_TOKEN != ''
+        run: |
+          npm install -g snyk
+          snyk test --json > snyk-results.json || true
           
       - name: Save scan results
         uses: actions/upload-artifact@v3
@@ -45,4 +70,30 @@ jobs:
           name: security-scan-results
           path: |
             scan-results/
-            slither-report.md 
+            slither-report.md
+            npm-audit.json
+            dependency-check.log
+            dappeteer-deps.json
+            snyk-results.json
+            
+      - name: Analyze results and create issues for critical vulnerabilities
+        if: github.event_name == 'schedule' # Only run on scheduled jobs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Install jq for JSON parsing
+          sudo apt-get install jq -y
+          
+          # Check for critical vulnerabilities in npm audit
+          CRITICAL_VULNS=$(cat npm-audit.json | jq '.vulnerabilities | map(select(.severity == "critical"))')
+          CRITICAL_COUNT=$(echo $CRITICAL_VULNS | jq 'length')
+          
+          if [ "$CRITICAL_COUNT" -gt 0 ]; then
+            # Create an issue for critical vulnerabilities
+            TITLE="Critical Security Vulnerabilities Found - $(date +%Y-%m-%d)"
+            BODY="## Critical Security Vulnerabilities\n\nThe automated security scan has detected $CRITICAL_COUNT critical vulnerabilities in the dependencies.\n\nPlease review the security scan results and update the affected dependencies as soon as possible.\n\n\`\`\`json\n$CRITICAL_VULNS\n\`\`\`"
+            
+            # Use GitHub CLI to create an issue
+            echo "$BODY" > issue-body.md
+            gh issue create --title "$TITLE" --body-file issue-body.md --label "security,critical"
+          fi 

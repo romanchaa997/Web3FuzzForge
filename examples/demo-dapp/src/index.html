@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web3 Demo dApp</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Web3 Demo Application</h1>
+      <p>A showcase of common Web3 patterns for testing</p>
+    </header>
+
+    <section id="wallet-section">
+      <h2>Wallet Connection</h2>
+      <button id="connect-wallet" class="btn primary">Connect Wallet</button>
+      <div id="wallet-info" class="info-box hidden">
+        <h3>Wallet Connected</h3>
+        <p>Address: <span id="wallet-address">Not connected</span></p>
+        <p>Network: <span id="network-name">Unknown</span></p>
+        <p>Chain ID: <span id="chain-id">Unknown</span></p>
+      </div>
+    </section>
+
+    <section id="transaction-section" class="hidden">
+      <h2>Transaction Interactions</h2>
+      
+      <div class="card">
+        <h3>Simple Transfer</h3>
+        <div class="form-group">
+          <label for="eth-amount">Amount (ETH):</label>
+          <input type="number" id="eth-amount" min="0.0001" step="0.0001" value="0.0001">
+        </div>
+        <div class="form-group">
+          <label for="recipient-address">Recipient Address:</label>
+          <input type="text" id="recipient-address" placeholder="0x...">
+        </div>
+        <button id="send-transaction" class="btn secondary">Send Transaction</button>
+      </div>
+      
+      <div class="card">
+        <h3>Contract Interaction</h3>
+        <div class="form-group">
+          <label for="token-address">Token Contract Address:</label>
+          <input type="text" id="token-address" placeholder="0x..." value="0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2">
+        </div>
+        <div class="form-group">
+          <label for="token-recipient">Recipient Address:</label>
+          <input type="text" id="token-recipient" placeholder="0x...">
+        </div>
+        <div class="form-group">
+          <label for="token-amount">Amount:</label>
+          <input type="number" id="token-amount" min="1" step="1" value="1">
+        </div>
+        <button id="token-transfer" class="btn secondary">Transfer Tokens</button>
+      </div>
+    </section>
+
+    <section id="signing-section" class="hidden">
+      <h2>Message Signing</h2>
+      
+      <div class="card">
+        <h3>Sign Message</h3>
+        <div class="form-group">
+          <label for="message-to-sign">Message:</label>
+          <textarea id="message-to-sign" placeholder="Enter a message to sign">Hello Web3 Security Testing!</textarea>
+        </div>
+        <button id="sign-message" class="btn secondary">Sign Message</button>
+      </div>
+      
+      <div class="card">
+        <h3>Sign Typed Data (EIP-712)</h3>
+        <div class="form-group">
+          <p>Domain: Demo dApp</p>
+          <p>Type: Authorization</p>
+          <p>Action: Access Request</p>
+        </div>
+        <button id="sign-typed-data" class="btn secondary">Sign Typed Data</button>
+      </div>
+    </section>
+
+    <section id="security-section" class="hidden">
+      <h2>Security Test Cases</h2>
+      
+      <div class="card dangerous">
+        <h3>⚠️ Vulnerable Function (For Testing)</h3>
+        <p class="warning">This section contains intentional vulnerabilities for security testing.</p>
+        <button id="execute-vulnerable" class="btn danger">Execute Vulnerable Function</button>
+      </div>
+      
+      <div class="card dangerous">
+        <h3>⚠️ Multiple Approval Test</h3>
+        <button id="request-multiple-approvals" class="btn danger">Request Multiple Approvals</button>
+      </div>
+    </section>
+
+    <section id="results-section">
+      <h2>Results</h2>
+      <div id="transaction-result" class="result-box hidden"></div>
+      <div id="signature-result" class="result-box hidden"></div>
+      <div id="error-result" class="result-box error hidden"></div>
+    </section>
+  </div>
+
+  <script type="module" src="index.js"></script>
+</body>
+</html> 

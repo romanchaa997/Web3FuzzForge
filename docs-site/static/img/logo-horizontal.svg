@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 80" fill="none">
+  <defs>
+    <linearGradient id="gradientFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3778FF" />
+      <stop offset="100%" stop-color="#6147FF" />
+    </linearGradient>
+  </defs>
+  <!-- Shield base -->
+  <path d="M40 5L65 12V30C65 44 52.5 55 40 62C27.5 55 15 44 15 30V12L40 5Z" fill="url(#gradientFill)" />
+  <!-- Web3 network lines -->
+  <path d="M30 33L40 23L50 33L40 43L30 33Z" stroke="white" stroke-width="1.5" fill="none" />
+  <!-- Lock/security symbol -->
+  <path d="M34 40H46V30C46 25.5 43.5 22 40 22C36.5 22 34 25.5 34 30V40Z" stroke="white" stroke-width="1.5" fill="none" />
+  <circle cx="40" cy="35" r="2" fill="white" />
+  <rect x="39" y="35" width="2" height="7" rx="1" fill="white" />
+  
+  <!-- Text -->
+  <path d="M85 20L90 20L90 60L85 60L85 20Z" fill="#3778FF"/>
+  <path d="M95 20L115 20C121 20 125 24 125 30C125 36 121 40 115 40L95 40L95 20ZM100 35L113 35C118 35 120 33 120 30C120 27 118 25 113 25L100 25L100 35Z" fill="#3778FF"/>
+  <path d="M130 20L155 20L155 25L135 25L135 37L150 37L150 42L135 42L135 55L155 55L155 60L130 60L130 20Z" fill="#3778FF"/>
+  <path d="M158 20L165 20L175 50L185 20L192 20L178 60L172 60L158 20Z" fill="#6147FF"/>
+  <path d="M195 40C195 28 205 18 217 18C229 18 239 28 239 40C239 52 229 62 217 62C205 62 195 52 195 40ZM200 40C200 49 207 57 217 57C226 57 234 49 234 40C234 31 226 23 217 23C207 23 200 31 200 40Z" fill="#6147FF"/>
+  <path d="M250 20L255 20L255 35L275 35L275 20L280 20L280 60L275 60L275 40L255 40L255 60L250 60L250 20Z" fill="#b947ff"/>
+  <path d="M285 20L292 20L300 30L292 40L300 50L292 60L285 60L293 50L285 40L293 30L285 20Z" fill="#b947ff"/>
+</svg> 

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="gradientFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3778FF" />
+      <stop offset="100%" stop-color="#6147FF" />
+    </linearGradient>
+  </defs>
+  <!-- Shield base -->
+  <path d="M50 10L85 20V45C85 65 70 80 50 90C30 80 15 65 15 45V20L50 10Z" fill="#19191F" stroke="url(#gradientFill)" stroke-width="2" />
+  <!-- Web3 network lines -->
+  <path d="M35 50L50 35L65 50L50 65L35 50Z" stroke="url(#gradientFill)" stroke-width="2.5" fill="none" />
+  <!-- Lock/security symbol -->
+  <path d="M42 58H58V45C58 38.5 54.5 33 50 33C45.5 33 42 38.5 42 45V58Z" stroke="url(#gradientFill)" stroke-width="2.5" fill="none" />
+  <circle cx="50" cy="52" r="3" fill="#6147FF" />
+  <rect x="48" y="52" width="4" height="10" rx="1" fill="#6147FF" />
+</svg> 

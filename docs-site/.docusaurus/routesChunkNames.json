@@ -1,82 +1,125 @@
 {
-  "/docs-09d": {
-    "__comp": "5e95c892",
+  "/__docusaurus/debug-5ff": {
+    "__comp": "__comp---theme-debug-config-23-a-2ff",
     "__context": {
-      "plugin": "aba21aa0"
+      "plugin": "plugin---docusaurus-debugb-38-ad3"
+    }
+  },
+  "/__docusaurus/debug/config-5ba": {
+    "__comp": "__comp---theme-debug-config-23-a-2ff",
+    "__context": {
+      "plugin": "plugin---docusaurus-debugb-38-ad3"
+    }
+  },
+  "/__docusaurus/debug/content-a2b": {
+    "__comp": "__comp---theme-debug-contentba-8-ce7",
+    "__context": {
+      "plugin": "plugin---docusaurus-debugb-38-ad3"
+    },
+    "__props": "__props---docusaurus-debug-content-3-c-0-be2"
+  },
+  "/__docusaurus/debug/globalData-c3c": {
+    "__comp": "__comp---theme-debug-global-dataede-0fa",
+    "__context": {
+      "plugin": "plugin---docusaurus-debugb-38-ad3"
+    }
+  },
+  "/__docusaurus/debug/metadata-156": {
+    "__comp": "__comp---theme-debug-site-metadata-68-e-3d4",
+    "__context": {
+      "plugin": "plugin---docusaurus-debugb-38-ad3"
+    }
+  },
+  "/__docusaurus/debug/registry-88c": {
+    "__comp": "__comp---theme-debug-registry-679-501",
+    "__context": {
+      "plugin": "plugin---docusaurus-debugb-38-ad3"
+    }
+  },
+  "/__docusaurus/debug/routes-000": {
+    "__comp": "__comp---theme-debug-routes-946-699",
+    "__context": {
+      "plugin": "plugin---docusaurus-debugb-38-ad3"
+    }
+  },
+  "/docs-09d": {
+    "__comp": "__comp---theme-docs-root-5-e-9-0b6",
+    "__context": {
+      "plugin": "plugin---docsaba-d7c"
     }
   },
   "/docs-f0b": {
-    "__comp": "a7bd4aaa",
-    "__props": "0058b4c6"
+    "__comp": "__comp---theme-doc-version-roota-7-b-5de",
+    "__props": "__props---docs-005-788"
   },
   "/docs-5d8": {
-    "__comp": "a94703ab"
+    "__comp": "__comp---theme-doc-roota-94-67a"
   },
   "/docs/advanced-guides-8d0": {
-    "__comp": "17896441",
-    "content": "49f5aec1"
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-advanced-guides-49-f-a02"
   },
   "/docs/commands-reference-2da": {
-    "__comp": "17896441",
-    "content": "327310c7"
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-commands-reference-327-3a1"
   },
   "/docs/community-test-examples-9cd": {
-    "__comp": "17896441",
-    "content": "8fdcbfa5"
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-community-test-examples-8-fd-ca8"
   },
   "/docs/cross-chain-testing-1c9": {
-    "__comp": "17896441",
-    "content": "93d7ccff"
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-cross-chain-testing-93-d-b70"
   },
   "/docs/installation-ce6": {
-    "__comp": "17896441",
-    "content": "3b8c55ea"
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-installation-3-b-8-7c6"
   },
   "/docs/intro-853": {
-    "__comp": "17896441",
-    "content": "0e384e19"
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-intro-0-e-3-be1"
   },
   "/docs/mobile-wallets-ff1": {
-    "__comp": "17896441",
-    "content": "7938c406"
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-mobile-wallets-793-264"
   },
   "/docs/overview-0b5": {
-    "__comp": "17896441",
-    "content": "1db64337"
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-overview-1-db-071"
   },
   "/docs/quickstart-cc0": {
-    "__comp": "17896441",
-    "content": "8070e160"
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-quickstart-807-6cd"
   },
   "/docs/real-wallet-integration-7fd": {
-    "__comp": "17896441",
-    "content": "f972eaff"
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-real-wallet-integrationf-97-d7a"
   },
   "/docs/reporting-overview-c10": {
-    "__comp": "17896441",
-    "content": "946ec582"
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-reporting-overview-946-213"
   },
   "/docs/security-testing-d4c": {
-    "__comp": "17896441",
-    "content": "b204ab36"
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-security-testingb-20-4e5"
   },
   "/docs/vulnerability-categorization-ab0": {
-    "__comp": "17896441",
-    "content": "ea2bbc0a"
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-vulnerability-categorizationea-2-4e1"
   },
   "/docs/wallet-state-snapshots-0e3": {
-    "__comp": "17896441",
-    "content": "388236a8"
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-wallet-state-snapshots-388-b56"
   },
   "/docs/why-it-matters-019": {
-    "__comp": "17896441",
-    "content": "79d17244"
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---docs-why-it-matters-79-d-13b"
   },
   "/-2e1": {
-    "__comp": "c4f5d8e4",
+    "__comp": "__comp---site-src-pages-index-jsc-4-f-f99",
     "__context": {
-      "plugin": "a7456010"
+      "plugin": "plugin---a-74-9d6"
     },
-    "config": "5e9f5e1a"
+    "config": "config---5-e-9-4f3"
   }
 }

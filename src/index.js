@@ -9,6 +9,7 @@ const { execSync, spawnSync } = require('child_process')
 const prettier = require('prettier')
 const { exec } = require('child_process')
 const configValidator = require('./config-validator')
+const errorHandler = require('./utils/error-handler')
 
 const program = new Command()
 
@@ -508,8 +509,10 @@ function displayHelp(command) {
   } else if (command === 'init') {
     console.log('  web3fuzzforge init')
     console.log('  web3fuzzforge init --force')
+    console.log('  web3fuzzforge init --interactive')
     console.log('\nThe init command creates a default .web3fuzzforge.json configuration file.')
     console.log('Use --force to overwrite an existing configuration file.')
+    console.log('Use --interactive for a guided setup wizard that detects your project type.')
   } else if (command === 'ask') {
     console.log('  web3fuzzforge ask "Generate a test for MetaMask connection to a DEX"')
     console.log(
@@ -910,6 +913,12 @@ async function runInitCommand(options) {
     return
   }
 
+  // If interactive mode is enabled, run the interactive setup
+  if (options.interactive) {
+    await runInteractiveSetup(configPath)
+    return
+  }
+
   // Create the default configuration file
   const result = configValidator.createDefaultConfig(configPath)
 
@@ -918,6 +927,189 @@ async function runInitCommand(options) {
     console.log(chalk.blue('You can customize this file for your specific testing needs.'))
   } else {
     console.error(chalk.red(result.message))
+  }
+}
+
+/**
+ * Run the interactive setup wizard
+ * @param {string} configPath - Path to save the configuration file
+ * @returns {Promise<void>}
+ */
+async function runInteractiveSetup(configPath) {
+  // We need to import inquirer dynamically since it's not loaded at the top
+  try {
+    // Check if inquirer is installed
+    try {
+      require.resolve('inquirer')
+    } catch (e) {
+      console.log(chalk.yellow('Installing inquirer package for interactive mode...'))
+      
+      // Use execSync to install inquirer
+      const { execSync } = require('child_process')
+      execSync('npm install --no-save inquirer@^8.0.0', { stdio: 'inherit' })
+      
+      console.log(chalk.green('✓ Inquirer installed successfully'))
+    }
+    
+    const inquirer = require('inquirer')
+    
+    // Detect project type
+    const projectType = await detectProjectType()
+    
+    console.log(chalk.blue('\nConfiguring Web3FuzzForge...'))
+    
+    // Default configuration from validator
+    const defaultConfig = configValidator.generateDefaultConfig()
+    
+    // Run the interactive prompts
+    const answers = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'wallet',
+        message: 'Select default wallet to test:',
+        default: defaultConfig.wallet,
+        choices: [
+          { name: 'MetaMask', value: 'metamask' },
+          { name: 'Coinbase Wallet', value: 'coinbase' },
+          { name: 'WalletConnect', value: 'walletconnect' },
+          { name: 'Phantom', value: 'phantom' },
+          { name: 'Rabby', value: 'rabby' }
+        ]
+      },
+      {
+        type: 'input',
+        name: 'dapp_url',
+        message: 'Enter the URL of your dApp:',
+        default: defaultConfig.dapp_url,
+        validate: input => input.startsWith('http') ? true : 'Please enter a valid URL starting with http/https'
+      },
+      {
+        type: 'input',
+        name: 'connect_button_selector',
+        message: 'Enter CSS selector for your wallet connect button:',
+        default: defaultConfig.connect_button_selector,
+        validate: input => input.length > 0 ? true : 'Selector cannot be empty'
+      },
+      {
+        type: 'list',
+        name: 'lang',
+        message: 'Select your preferred language:',
+        default: defaultConfig.lang,
+        choices: [
+          { name: 'JavaScript', value: 'js' },
+          { name: 'TypeScript', value: 'ts' }
+        ]
+      },
+      {
+        type: 'input',
+        name: 'out',
+        message: 'Where should generated tests be saved?',
+        default: defaultConfig.out
+      },
+      {
+        type: 'confirm',
+        name: 'lint',
+        message: 'Enable automatic linting of generated tests?',
+        default: defaultConfig.lint
+      }
+    ])
+
+    // Create configuration with user answers
+    const config = {
+      ...answers,
+      // Add project-specific settings based on detected project type
+      project_type: projectType
+    }
+
+    // Write the configuration file
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf8')
+    
+    console.log(chalk.green(`\n✓ Configuration created successfully at: ${configPath}`))
+    console.log(chalk.blue('You can further customize this file manually for specific testing needs.'))
+    
+    // Validate the created configuration
+    const { isValid, errors } = configValidator.validateConfig(config)
+    
+    if (!isValid) {
+      console.log(chalk.yellow('\nWarning: Some configuration values may need adjustment:'))
+      errors.forEach(error => console.log(chalk.yellow(`- ${error}`)))
+    }
+    
+  } catch (error) {
+    console.error(chalk.red(`Error during interactive setup: ${error.message}`))
+    console.log(chalk.yellow('Falling back to default configuration...'))
+    
+    // Fallback to non-interactive mode
+    const result = configValidator.createDefaultConfig(configPath)
+    
+    if (result.success) {
+      console.log(chalk.green(result.message))
+    } else {
+      console.error(chalk.red(result.message))
+    }
+  }
+}
+
+/**
+ * Detect the project type to suggest appropriate templates
+ * @returns {Promise<string>} Detected project type
+ */
+async function detectProjectType() {
+  console.log(chalk.blue('Detecting project type...'))
+  
+  try {
+    const cwd = process.cwd()
+    
+    // Check for package.json to determine project type
+    const packageJsonPath = path.join(cwd, 'package.json')
+    
+    if (fs.existsSync(packageJsonPath)) {
+      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
+      
+      // Look for common dependencies to identify project type
+      const deps = { ...packageJson.dependencies, ...packageJson.devDependencies }
+      
+      if (deps.react && deps['web3.js']) {
+        console.log(chalk.green('✓ Detected: React dApp with web3.js'))
+        return 'react-web3'
+      } else if (deps.react && deps.ethers) {
+        console.log(chalk.green('✓ Detected: React dApp with ethers.js'))
+        return 'react-ethers'
+      } else if (deps.vue && (deps.web3 || deps.ethers)) {
+        console.log(chalk.green('✓ Detected: Vue dApp'))
+        return 'vue-web3'
+      } else if (deps.hardhat) {
+        console.log(chalk.green('✓ Detected: Hardhat project'))
+        return 'hardhat'
+      } else if (deps.truffle) {
+        console.log(chalk.green('✓ Detected: Truffle project'))
+        return 'truffle'
+      } else if (deps.express || deps.koa || deps.fastify) {
+        console.log(chalk.green('✓ Detected: Node.js backend'))
+        return 'node-backend'
+      }
+    }
+    
+    // Check for common files to determine project type
+    if (fs.existsSync(path.join(cwd, 'truffle-config.js'))) {
+      console.log(chalk.green('✓ Detected: Truffle project'))
+      return 'truffle'
+    } else if (fs.existsSync(path.join(cwd, 'hardhat.config.js')) || 
+               fs.existsSync(path.join(cwd, 'hardhat.config.ts'))) {
+      console.log(chalk.green('✓ Detected: Hardhat project'))
+      return 'hardhat'
+    } else if (fs.existsSync(path.join(cwd, 'foundry.toml'))) {
+      console.log(chalk.green('✓ Detected: Foundry project'))
+      return 'foundry'
+    }
+    
+    // Default if no specific type detected
+    console.log(chalk.yellow('No specific project type detected. Using generic configuration.'))
+    return 'generic'
+    
+  } catch (error) {
+    console.log(chalk.yellow('Error detecting project type. Using generic configuration.'))
+    return 'generic'
   }
 }
 
@@ -947,54 +1139,81 @@ program
   .option('--lint', 'Lint and format the generated template with ESLint and Prettier', false)
   .action(async (type, options) => {
     try {
+      // Run environment check first
+      await errorHandler.checkEnvironment()
+      
+      // Original command code
+      console.log(chalk.blue(`Generating ${type} template...`))
+
+      // Add alias mapping for template types
+      const templateTypeMap = {
+        connection: 'connect',
+        transaction: 'tx',
+        signing: 'sign',
+        signature: 'sign',
+        security: 'security',
+        vuln: 'security',
+        vulnerability: 'security',
+      }
+
+      // Look up presets by name or alias
+      const presetMap = {
+        erc: 'erc20-token',
+        erc20: 'erc20-token',
+        erc721: 'erc721-nft',
+        nft: 'erc721-nft',
+        defi: 'defi-swap',
+        swap: 'defi-swap',
+        dao: 'dao-voting',
+        voting: 'dao-voting',
+        security: 'security-full',
+        full: 'security-full',
+      }
+
       // Validate template type
-      if (!validateTemplateType(type)) {
-        displayHelp('generate')
-        process.exit(1)
+      const validTypes = ['connect', 'tx', 'sign', 'security', 'error', ...Object.keys(templateTypeMap)]
+      if (!validTypes.includes(type)) {
+        throw new Error(`Invalid template type: ${type}. Valid types are: ${validTypes.join(', ')}`)
       }
 
-      // Set default values for options not provided
-      options.lang = options.lang || 'js'
-      options.out = options.out || './tests/test.js'
-      options.address = options.address || defaultValues.address
-      options.walletName = options.walletName || defaultValues.wallet
-      options.recipient = options.recipient || defaultValues.recipient
-      options.amount = options.amount || defaultValues.amount
-      options.network = options.network || defaultValues.network
-
-      // Handle provider selection - IMPORTANT: provider takes precedence over wallet
-      if (options.provider && !options.wallet) {
-        options.wallet = options.provider
-      } else if (!options.provider && !options.wallet) {
-        options.provider = 'metamask'
-        options.wallet = 'metamask'
-      }
-
-      // Remove debug logs
-      // console.log(chalk.cyan(`Final options.provider: ${options.provider}`));
-      // console.log(chalk.cyan(`Final options.wallet: ${options.wallet}`));
-
-      // Load preset configuration if specified
+      // Load preset config if specified
       let presetConfig = {}
       if (options.preset) {
-        presetConfig = loadPresetConfig(options.preset) || {}
-        if (Object.keys(presetConfig).length === 0) {
-          console.log(chalk.yellow('Continuing without preset configuration.'))
+        const presetName = presetMap[options.preset] || options.preset
+        const presetPath = path.join(__dirname, 'presets', `${presetName}.json`)
+
+        try {
+          if (fs.existsSync(presetPath)) {
+            presetConfig = JSON.parse(fs.readFileSync(presetPath, 'utf8'))
+            console.log(chalk.blue(`Loaded preset: ${options.preset}`))
+          } else {
+            console.error(
+              chalk.yellow(`Warning: Preset "${options.preset}" not found, using default settings`)
+            )
+          }
+        } catch (presetError) {
+          console.error(
+            chalk.yellow(
+              `Warning: Error loading preset "${options.preset}": ${presetError.message}`
+            )
+          )
         }
       }
 
-      // Validate language (after potential preset load)
-      const langToValidate = options.lang || presetConfig.lang || 'js'
-      if (!validateLanguage(langToValidate)) {
-        displayHelp('generate')
-        process.exit(1)
+      // Validate provider - but don't override with default yet
+      const providerToValidate = options.provider || options.wallet || presetConfig.provider || presetConfig.wallet
+      
+      function validateProvider(provider) {
+        const validProviders = ['metamask', 'walletconnect', 'coinbase', 'phantom', 'rabby']
+        return validProviders.includes(provider)
       }
-
-      // Validate provider (after potential preset load)
-      const providerToValidate = options.provider || presetConfig.provider || 'metamask'
-      if (!validateProvider(providerToValidate)) {
-        displayHelp('generate')
-        process.exit(1)
+      
+      if (providerToValidate && !validateProvider(providerToValidate)) {
+        console.log(
+          chalk.yellow(
+            `Warning: Invalid provider "${providerToValidate}". Valid providers are: metamask, walletconnect, coinbase, phantom, rabby`
+          )
+        )
       }
 
       // Validate wallet - same as provider validation but for the wallet option
@@ -1006,317 +1225,17 @@ program
 
       // Validate output path
       if (!options.out && !presetConfig.out) {
-        console.error(chalk.red('Error: Output file path is required'))
-        console.log(chalk.yellow('Please specify an output file using the --out option'))
-        displayHelp('generate')
-        process.exit(1)
+        throw new Error('Output file path is required. Please specify using --out option.')
       }
 
       // Load configuration from .web3fuzzforge.json if it exists
       const configDefaults = loadConfigFile()
 
-      // Check if linting is enabled in config (if not specified in command line)
-      if (options.lint === undefined) {
-        if (presetConfig.lint !== undefined) {
-          options.lint = presetConfig.lint
-        } else if (configDefaults.lint !== undefined) {
-          options.lint = configDefaults.lint
-        }
-      }
-
-      // Map the template type alias to the actual template name
-      const templateType = templateTypeMap[type] || type
-
-      // Determine template file extension based on language option (priority: CLI > preset > config file > default)
-      const configLang = options.lang || presetConfig.lang || configDefaults.lang || 'js'
-      const isTypeScript = configLang === 'ts'
-      const templateExt = isTypeScript ? 'ts' : 'js'
-
-      // Determine template file based on type and provider (priority: CLI > preset > config file > default)
-      const provider =
-        options.provider || presetConfig.provider || configDefaults.provider || 'metamask'
-
-      // IMPORTANT: Always set wallet option based on provider if not explicitly provided
-      // This overrides any wallet name from config that might be mistakenly used as a provider
-      let walletToUse
-
-      // Remove debug start logs
-      // console.log('DEBUG START ----------------------');
-      // console.log(`options.provider = "${options.provider}"`);
-      // console.log(`options.wallet = "${options.wallet}"`);
-      // console.log(`provider = "${provider}"`);
-
-      // If --wallet is specified explicitly, use that
-      if (options.wallet && validateProvider(options.wallet)) {
-        walletToUse = options.wallet
-        // Remove debug log
-        // console.log(`A: walletToUse set to "${walletToUse}" from options.wallet`);
-      } else if (options.provider) {
-        walletToUse = provider
-        // Remove debug log
-        // console.log(`B: walletToUse set to "${walletToUse}" from provider`);
-      } else {
-        walletToUse = 'metamask'
-        // Remove debug log
-        // console.log(`C: walletToUse set to "${walletToUse}" as default`);
-      }
-      // Remove debug end logs
-      // console.log(`Final walletToUse = "${walletToUse}"`);
-      // console.log('DEBUG END ------------------------');
-
-      // Log which wallet is being used
-      if (walletToUse === 'walletconnect') {
-        console.log(chalk.blue('Using WalletConnect provider'))
-      } else if (walletToUse === 'rabby') {
-        console.log(chalk.yellow('Rabby wallet support is planned for future releases'))
-        // We now have a Rabby template that internally uses the MetaMask provider
-        console.log(chalk.blue('Using Rabby templates (based on MetaMask)'))
-      } else if (walletToUse === 'coinbase') {
-        console.log(chalk.blue('Using Coinbase Wallet provider (Alpha support)'))
-      } else {
-        console.log(chalk.blue('Using MetaMask provider'))
-      }
-
-      // IMPORTANT: Use walletToUse directly in template path construction, not options.wallet
-      const templateResult = checkTemplateExistence(walletToUse, templateType, templateExt, true)
-      const templateFile = templateResult.templatePath
-      const templateWasGenerated = templateResult.generated
-
-      // Display appropriate message for template status
-      if (templateWasGenerated) {
-        console.log(
-          chalk.yellow(
-            `Template for ${walletToUse} ${type} was missing, generated placeholder template.`
-          )
-        )
-        console.log(
-          chalk.yellow(
-            'Please consider submitting a PR with a proper implementation of this template.'
-          )
-        )
-      } else if (!templateResult.exists) {
-        console.error(chalk.red(`Template not found: ${templateFile}`))
-        console.log(
-          chalk.yellow(
-            `This may mean the combination of provider (${provider}) and template type (${type}) is not supported yet.`
-          )
-        )
-
-        console.log(chalk.yellow('\nAvailable templates are:'))
-
-        const templatesDir = path.join(__dirname, '..', 'templates', 'providers')
-        if (fs.existsSync(templatesDir)) {
-          const availableTemplates = fs.readdirSync(templatesDir)
-
-          if (availableTemplates.length === 0) {
-            console.log(chalk.red('No templates found. The installation might be corrupted.'))
-          } else {
-            availableTemplates.forEach(template => {
-              console.log(chalk.green(`- ${template.replace('.tpl', '').replace('.ts.tpl', '')}`))
-            })
-          }
-        } else {
-          console.error(chalk.red(`Templates directory not found: ${templatesDir}`))
-          console.log(
-            chalk.yellow('The installation might be corrupted. Try reinstalling the package.')
-          )
-        }
-
-        process.exit(1)
-      }
-
-      // Read template content
-      let templateContent
-      try {
-        templateContent = fs.readFileSync(templateFile, 'utf8')
-      } catch (readError) {
-        console.error(chalk.red(`Error reading template file: ${readError.message}`))
-        process.exit(1)
-      }
-
-      // Create replacements object with values in order of precedence:
-      // 1. Command-line options (highest)
-      // 2. Preset configuration
-      // 3. Config file values
-      // 4. Default values (lowest)
-      const replacements = {
-        ...defaultValues,
-        ...configDefaults,
-        ...presetConfig,
-      }
-
-      // Update replacements with command-line options (highest precedence)
-      if (options.address) replacements.address = options.address
-      if (options.walletName) replacements.wallet = options.walletName
-      if (options.recipient) replacements.recipient = options.recipient
-      if (options.amount) replacements.amount = options.amount
-      if (options.network) replacements.network = options.network
-      if (options.out) replacements.out = options.out
-
-      // Replace placeholders in template
-      let outputContent = replacePlaceholders(templateContent, replacements)
-
-      // Inject fuzzing test cases if --fuzz flag is enabled
-      if (options.fuzz) {
-        console.log(chalk.blue('Injecting security fuzzing test cases...'))
-        outputContent = injectFuzzingTestCases(outputContent, type, configLang)
-      }
-
-      // Ensure output directory exists
-      const outputPath = options.out || replacements.out || './tests/test.js'
-      const outputDir = path.dirname(outputPath)
-      try {
-        fs.ensureDirSync(outputDir)
-      } catch (dirError) {
-        console.error(chalk.red(`Error creating output directory: ${dirError.message}`))
-        console.log(
-          chalk.yellow(`Please check if you have permissions to create directory: ${outputDir}`)
-        )
-        process.exit(1)
-      }
-
-      // Adjust output file extension if TypeScript is selected but output doesn't end with .ts
-      let finalOutputPath = outputPath
-      if (isTypeScript && !finalOutputPath.endsWith('.ts')) {
-        finalOutputPath = finalOutputPath.replace(/\.js$/, '.ts')
-        if (!finalOutputPath.endsWith('.ts')) {
-          finalOutputPath += '.ts'
-        }
-        // Remove debug log
-        // console.log(chalk.yellow(`Adjusting output file extension to .ts: ${finalOutputPath}`));
-      }
-
-      // Write output file
-      try {
-        // Prettify output before writing
-        outputContent = await prettifyTemplate(outputContent, finalOutputPath)
-        fs.writeFileSync(finalOutputPath, outputContent)
-        console.log(chalk.green(`Test template generated successfully: ${finalOutputPath}`))
-        if (options.fuzz) {
-          console.log(chalk.green('Security fuzzing test cases have been injected:'))
-          console.log(chalk.yellow('- XSS payloads for input fields (where applicable)'))
-          if (type === 'tx') {
-            console.log(chalk.yellow('- Large transaction amounts for DoS testing'))
-          }
-          if (type === 'sign') {
-            console.log(chalk.yellow('- eth_sign phishing vectors'))
-          }
-        }
-        // Show which preset was used if applicable
-        if (options.preset && presetConfig.name) {
-          console.log(chalk.green(`Used preset: ${presetConfig.name}`))
-        }
-        // Lint and format the file if --lint option is provided
-        if (options.lint) {
-          try {
-            console.log(chalk.blue('Linting and fixing generated template with ESLint...'))
-            await lintAndFixFile(finalOutputPath)
-          } catch (lintError) {
-            console.error(
-              chalk.yellow(`Warning: Linting encountered an error: ${lintError.message}`)
-            )
-          }
-        }
-      } catch (writeError) {
-        console.error(chalk.red(`Error writing output file: ${writeError.message}`))
-        console.log(
-          chalk.yellow(`Please check if you have permissions to write to: ${finalOutputPath}`)
-        )
-        process.exit(1)
-      }
+      // Use our new error handling system
+      errorHandler.handleError(error, 'Generate command', true)
     } catch (error) {
-      console.error(chalk.red(`Error generating template: ${error.message}`))
-      if (error.stack) {
-        console.debug(chalk.gray(error.stack))
-      }
-      displayHelp('generate')
-      process.exit(1)
-    }
-  })
-
-// Init command - creating a new project
-program
-  .command('init')
-  .description('Initialize a new Web3FuzzForge configuration file')
-  .option('--force', 'Overwrite existing configuration file', false)
-  .action(async options => {
-    await runInitCommand(options)
-  })
-
-// Check Templates command
-program
-  .command('check-templates')
-  .description('Check for missing template combinations and generate placeholders if requested')
-  .option('--generate', 'Generate placeholder templates for missing combinations', false)
-  .action(async options => {
-    console.log(chalk.blue('Checking for missing template combinations...'))
-
-    // Template types and wallet combinations to check
-    const templateTypes = ['connection', 'transaction', 'sign', 'error', 'security']
-    const wallets = ['metamask', 'walletconnect', 'rabby', 'coinbase', 'phantom']
-    const extensions = ['.tpl', '.ts.tpl']
-
-    // Track missing templates
-    const missingTemplates = []
-    let generatedCount = 0
-
-    // Check each combination
-    wallets.forEach(wallet => {
-      templateTypes.forEach(templateType => {
-        extensions.forEach(ext => {
-          const templateResult = checkTemplateExistence(
-            wallet, templateType,
-            ext,
-            options.generate
-          )
-
-          if (!templateResult.exists) {
-            missingTemplates.push({
-              wallet,
-              templateType,
-              extension: ext,
-            })
-          } else if (templateResult.generated) {
-            generatedCount++
-            console.log(
-              chalk.green(`Generated placeholder template: ${templateResult.templatePath}`)
-            )
-          }
-        })
-      })
-    })
-
-    // Report results
-    if (missingTemplates.length === 0) {
-      console.log(chalk.green('All template combinations exist!'))
-    } else {
-      console.log(chalk.yellow(`Missing ${missingTemplates.length} template combinations:`))
-
-      // Group missing templates by wallet for better readability
-      const grouped = {}
-      missingTemplates.forEach(template => {
-        if (!grouped[template.wallet]) {
-          grouped[template.wallet] = []
-        }
-        grouped[template.wallet].push(`${template.templateType}${template.extension}`)
-      })
-
-      Object.keys(grouped)
-        .sort()
-        .forEach(wallet => {
-          console.log(chalk.yellow(`  ${wallet}:`))
-          grouped[wallet].sort().forEach(template => {
-            console.log(chalk.yellow(`    - ${template}`))
-          })
-        })
-
-      if (options.generate) {
-        console.log(chalk.green(`Generated ${generatedCount} placeholder templates`))
-      } else {
-        console.log(
-          chalk.blue('Run with --generate to create placeholder templates for missing combinations')
-        )
-      }
+      // Use our new error handling system
+      errorHandler.handleError(error, 'Generate command', true)
     }
   })
 
@@ -1339,520 +1258,140 @@ program
     'Run tests against the built-in mock dApp (starts the mock server automatically)',
     false
   )
-  .action(options => {
+  .action(async options => {
     try {
-      const { spawn } = require('child_process')
-      const utils = require(path.join(__dirname, '..', 'utils', 'ensure-reports-dir'))
+      // Run environment check first
+      await errorHandler.checkEnvironment()
+      
+      console.log(chalk.blue('Preparing to run Playwright tests...'))
 
-      // Ensure reports directory is ready
-      utils.ensureReportsDirectory()
+      // Load configuration from file
+      const userConfig = loadConfigFile()
 
-      // Check if at least one of target-url or mock-mode is provided
-      if (!options.targetUrl && !options.mockMode) {
-        console.error(chalk.red('Error: Either --target-url or --mock-mode must be specified.'))
-        console.log(chalk.blue('Run with --mock-mode to use the built-in mock dApp'))
-        console.log(
-          chalk.blue('or --target-url=http://your-app-url to test against a real application.')
-        )
-        process.exit(1)
+      // Set environment variables based on config and command line
+      if (options.target_url) {
+        process.env.TARGET_URL = options.target_url
+      } else if (userConfig && userConfig.dapp_url) {
+        process.env.TARGET_URL = userConfig.dapp_url
       }
 
-      // Create environment variables object with current environment
-      const envVars = { ...process.env }
-
-      // Set environment variables based on options
-      if (options.mockMode) {
-        envVars.MOCK_MODE = 'true'
-      }
-
-      if (options.targetUrl) {
-        envVars.TARGET_URL = options.targetUrl
-      }
-
-      // If mock-mode is enabled, start the mock dApp server
-      let mockProcess = null
-      if (options.mockMode) {
+      // Enable mock mode if requested
+      if (options.mock_mode) {
         console.log(chalk.blue('Starting mock dApp server...'))
+        process.env.MOCK_MODE = 'true'
 
-        // Use spawn with shell option to ensure npm is found on Windows
-        mockProcess = spawn('npm', ['start'], {
-          cwd: path.join(process.cwd(), 'mocked-sample-app'),
-          shell: true, // Add this to ensure npm command works on Windows
-          detached: process.platform !== 'win32',
-          stdio: ['ignore', 'pipe', 'pipe'],
+        // Start the mock server (in a separate process)
+        const mockServerProcess = spawn(process.execPath, ['./mocked-sample-app/src/server.js'], {
+          detached: true,
+          stdio: 'ignore',
         })
 
-        // Log output from the mock server
-        mockProcess.stdout.on('data', data => {
-          console.log(chalk.gray(`[Mock dApp] ${data.toString().trim()}`))
-        })
-
-        mockProcess.stderr.on('data', data => {
-          console.error(chalk.red(`[Mock dApp Error] ${data.toString().trim()}`))
-        })
+        // Don't wait for the child process - let it run independently
+        mockServerProcess.unref()
 
         // Wait for the server to start
-        console.log(chalk.yellow('Waiting for mock dApp server to start...'))
-        setTimeout(() => {
-          runPlaywrightTests()
-        }, 3000)
-      } else {
-        // Run tests immediately if not using mock mode
-        runPlaywrightTests()
+        console.log(chalk.blue('Waiting for mock server to start...'))
+        await new Promise(resolve => setTimeout(resolve, 2000))
       }
 
-      // eslint-disable-next-line no-inner-declarations
-      function runPlaywrightTests() {
-        // Build the command arguments
-        const args = ['playwright', 'test']
+      // Construct the Playwright command
+      const playwrightArgs = ['playwright', 'test']
 
-        if (options.headed) {
-          args.push('--headed')
-        }
-
-        if (options.debug) {
-          args.push('--debug')
-        }
-
-        if (options.project) {
-          args.push('--project', options.project)
-        }
-
-        if (options.grep) {
-          args.push('--grep', options.grep)
-        }
-
-        if (options.config) {
-          args.push('--config', options.config)
-        }
-
-        // Define reporter as HTML if report flag is set or we're in CI
-        if (options.report || process.env.CI) {
-          args.push('--reporter=html')
-        }
-
-        console.log(chalk.blue(`Running: npx ${args.join(' ')}`))
-
-        // For debug, show what environment variables we're using
-        console.log(chalk.blue('Using environment variables:'))
-        if (envVars.MOCK_MODE) console.log(chalk.blue(`  MOCK_MODE=${envVars.MOCK_MODE}`))
-        if (envVars.TARGET_URL) console.log(chalk.blue(`  TARGET_URL=${envVars.TARGET_URL}`))
-
-        // Spawn process with environment variables
-        const testProcess = spawn('npx', args, {
-          stdio: 'inherit',
-          shell: true,
-          env: envVars,
-        })
-
-        // Handle process exit
-        testProcess.on('exit', async code => {
-          // If we have a running mock server, kill it
-          if (mockProcess) {
-            console.log(chalk.blue('Shutting down mock dApp server...'))
-            if (process.platform === 'win32') {
-              spawn('taskkill', ['/pid', mockProcess.pid, '/f', '/t'], { stdio: 'ignore' })
-            } else {
-              process.kill(-mockProcess.pid)
-            }
-          }
-
-          if (code === 0) {
-            console.log(chalk.green('Tests completed successfully!'))
-
-            // Run merge-reports script if it exists
-            try {
-              await mergeReports()
-            } catch (error) {
-              console.error(chalk.yellow(`Warning: Could not merge reports: ${error.message}`))
-            }
-
-            // Open the report if requested and not in CI
-            if (!process.env.CI && options.report) {
-              console.log(chalk.blue('Opening HTML report...'))
-              const open = spawn('npx', ['playwright', 'show-report', 'reports'], {
-                stdio: 'inherit',
-                detached: true,
-              })
-            }
-          } else {
-            console.error(chalk.red(`Tests failed with code ${code}`))
-          }
-
-          process.exit(code)
-        })
-
-        testProcess.on('error', error => {
-          // If we have a running mock server, kill it
-          if (mockProcess) {
-            console.log(chalk.blue('Shutting down mock dApp server...'))
-            if (process.platform === 'win32') {
-              spawn('taskkill', ['/pid', mockProcess.pid, '/f', '/t'], { stdio: 'ignore' })
-            } else {
-              process.kill(-mockProcess.pid)
-            }
-          }
-
-          console.error(chalk.red(`Error running tests: ${error.message}`))
-          process.exit(1)
-        })
-      }
-    } catch (error) {
-      console.error(chalk.red(`Error: ${error.message}`))
-      process.exit(1)
-    }
-  })
-
-// Add a new 'ask' command
-program
-  .command('ask')
-  .description('Generate configuration or code using AI assistant')
-  .option('-q, --query <query>', 'Natural language query to generate code or configuration')
-  .option('-k, --key <key>', 'OpenAI API key (or set OPENAI_API_KEY environment variable)')
-  .action(async options => {
-    const openAIKey = options.key || process.env.OPENAI_API_KEY
-
-    if (!options.query) {
-      console.error(chalk.red('Error: Please provide a query with the --query option'))
-      process.exit(1)
-    }
-
-    if (!openAIKey) {
-      console.error(
-        chalk.red('Error: OPENAI_API_KEY environment variable or --key option is required')
-      )
-      process.exit(1)
-    }
-
-    try {
-      const generator = getOpenAIGenerator()
-      await generator.generateFromPrompt(options.query, openAIKey)
-    } catch (error) {
-      console.error(chalk.red(`Error: ${error.message}`))
-      if (error.stack && process.env.DEBUG) {
-        console.error(chalk.gray(error.stack))
-      }
-      process.exit(1)
-    }
-  })
-
-program
-  .command('doctor')
-  .description('Verify if basic mocks/configs are set up properly')
-  .action(async () => {
-    console.log(chalk.blue('🔍 Web3FuzzForge Doctor: Checking your environment...'))
-
-    const checkResults = {
-      configFile: { status: 'pending', message: 'Checking configuration file' },
-      environmentVars: { status: 'pending', message: 'Checking environment variables' },
-      dependencies: { status: 'pending', message: 'Verifying required dependencies' },
-      templateFiles: { status: 'pending', message: 'Checking template files' },
-      browsers: { status: 'pending', message: 'Checking browser setup for tests' },
-    }
-
-    // Function to update and display check status
-    const updateStatus = (check, status, message) => {
-      checkResults[check].status = status
-      checkResults[check].message = message
-
-      // Display with appropriate color
-      const icon =
-        status === 'success'
-          ? '✅'
-          : status === 'warning'
-            ? '⚠️'
-            : status === 'error'
-              ? '❌'
-              : '🔍'
-      const color =
-        status === 'success'
-          ? chalk.green
-          : status === 'warning'
-            ? chalk.yellow
-            : status === 'error'
-              ? chalk.red
-              : chalk.blue
-
-      console.log(`${icon} ${color(message)}`)
-    }
-
-    // Check configuration file
-    try {
-      const configValidator = require('./config-validator')
-      const result = configValidator.loadAndValidateConfig()
-
-      if (!result.fileExists) {
-        updateStatus(
-          'configFile',
-          'warning',
-          'Configuration file (.web3fuzzforge.json) not found. Run "web3fuzzforge init" to create one.'
-        )
-      } else if (!result.isValid) {
-        updateStatus(
-          'configFile',
-          'error',
-          `Configuration file exists but has errors: ${result.errors.join(', ')}`
-        )
-      } else {
-        updateStatus('configFile', 'success', 'Configuration file (.web3fuzzforge.json) is valid')
-      }
-    } catch (error) {
-      updateStatus('configFile', 'error', `Error checking configuration: ${error.message}`)
-    }
-
-    // Check environment variables
-    const requiredEnvVars = ['PLAYWRIGHT_BROWSERS_PATH']
-    const optionalEnvVars = ['OPENAI_API_KEY', 'DEBUG']
-    const missingRequired = requiredEnvVars.filter(v => !process.env[v])
-    const missingOptional = optionalEnvVars.filter(v => !process.env[v])
-
-    if (missingRequired.length > 0) {
-      updateStatus(
-        'environmentVars',
-        'warning',
-        `Missing recommended environment variables: ${missingRequired.join(', ')}`
-      )
-    } else {
-      let message = 'All recommended environment variables are set'
-      if (missingOptional.length > 0) {
-        message += `. Optional variables not set: ${missingOptional.join(', ')}`
-      }
-      updateStatus('environmentVars', 'success', message)
-    }
-
-    // Check dependencies
-    try {
-      // Verify @playwright/test is installed
-      const playwrightInfo = JSON.parse(
-        execSync('npm list @playwright/test --json', {
-          stdio: ['pipe', 'pipe', 'ignore'],
-        }).toString()
-      )
-      const dappeteerInfo = JSON.parse(
-        execSync('npm list @chainsafe/dappeteer --json', {
-          stdio: ['pipe', 'pipe', 'ignore'],
-        }).toString()
-      )
-
-      const hasDependencyIssues = playwrightInfo.problems || dappeteerInfo.problems
-
-      if (hasDependencyIssues) {
-        updateStatus(
-          'dependencies', 'error',
-          'Dependency issues detected. Run "npm install" to fix them.'
-        )
-      } else {
-        updateStatus('dependencies', 'success', 'All required dependencies are properly installed')
-      }
-    } catch (error) {
-      updateStatus('dependencies', 'error', `Error checking dependencies: ${error.message}`)
-    }
-
-    // Check template files existence
-    try {
-      const templatesPath = path.join(__dirname, '..', 'templates')
-      const providerDirs = ['metamask', 'coinbase', 'phantom', 'walletconnect', 'rabby']
-      const templates = ['connect', 'tx', 'sign']
-      const missingTemplates = []
-
-      for (const provider of providerDirs) {
-        for (const template of templates) {
-          const templatePath = path.join(templatesPath, 'providers', provider, `${template}.js`)
-          if (!fs.existsSync(templatePath)) {
-            missingTemplates.push(`${provider}/${template}.js`)
-          }
-        }
+      // Add options
+      if (options.project) {
+        playwrightArgs.push('--project', options.project)
       }
 
-      if (missingTemplates.length > 0) {
-        updateStatus(
-          'templateFiles',
-          'warning',
-          `Some template files are missing: ${missingTemplates.join(', ')}`
-        )
-      } else {
-        updateStatus('templateFiles', 'success', 'All template files are present')
+      if (options.grep) {
+        playwrightArgs.push('--grep', options.grep)
       }
-    } catch (error) {
-      updateStatus('templateFiles', 'error', `Error checking template files: ${error.message}`)
-    }
 
-    // Check browser setup
-    try {
-      const result = spawnSync('npx', ['playwright', 'install', '--dry-run'], {
-        stdio: ['ignore', 'pipe', 'pipe'],
-        encoding: 'utf-8',
+      if (options.headed) {
+        playwrightArgs.push('--headed')
+      }
+
+      if (options.debug) {
+        playwrightArgs.push('--debug')
+      }
+
+      if (options.config) {
+        playwrightArgs.push('--config', options.config)
+      }
+
+      // Run Playwright tests
+      console.log(chalk.blue(`Running Playwright with command: npx ${playwrightArgs.join(' ')}`))
+
+      const playwrightProcess = spawn('npx', playwrightArgs, {
+        stdio: 'inherit',
+        shell: true,
       })
 
-      if (result.status !== 0) {
-        updateStatus(
-          'browsers', 'error',
-          'Browser installation issue detected. Run "npx playwright install" to fix it.'
-        )
-      } else if (result.stdout.includes('already installed')) {
-        updateStatus('browsers', 'success', 'Playwright browsers are properly installed')
-      } else {
-        updateStatus(
-          'browsers', 'warning',
-          'Some browsers may need to be installed. Run "npx playwright install"'
-        )
-      }
+      return new Promise((resolve, reject) => {
+        playwrightProcess.on('close', code => {
+          if (code === 0) {
+            console.log(chalk.green('\n✓ Tests completed successfully!'))
+
+            // Generate and show report if requested
+            if (options.report) {
+              console.log(chalk.blue('Generating HTML report...'))
+              try {
+                // Ensure the reports directory exists
+                if (!fs.existsSync('./reports')) {
+                  fs.mkdirSync('./reports', { recursive: true })
+                }
+
+                // Copy the latest test results to the reports directory
+                const testResultsDir = path.join(process.cwd(), 'test-results')
+                const reportsDir = path.join(process.cwd(), 'reports')
+
+                if (fs.existsSync(testResultsDir)) {
+                  fs.copySync(testResultsDir, path.join(reportsDir, 'latest-results'))
+                }
+
+                // Create a simple HTML report
+                const reportPath = path.join(reportsDir, 'index.html')
+                const reportContent = generateSimpleReport()
+                fs.writeFileSync(reportPath, reportContent)
+
+                console.log(chalk.green(`✓ Report generated at: ${reportPath}`))
+
+                // Try to open the report in the default browser
+                try {
+                  const openCommand =
+                    process.platform === 'win32'
+                      ? 'start'
+                      : process.platform === 'darwin'
+                        ? 'open'
+                        : 'xdg-open'
+                  exec(`${openCommand} ${reportPath}`)
+                  console.log(chalk.blue('Opening report in your browser...'))
+                } catch (openError) {
+                  console.log(
+                    chalk.yellow(`Could not open report automatically: ${openError.message}`)
+                  )
+                  console.log(chalk.blue(`You can view the report at: ${reportPath}`))
+                }
+              } catch (reportError) {
+                console.error(
+                  chalk.yellow(`Warning: Failed to generate report: ${reportError.message}`)
+                )
+              }
+            }
+
+            resolve()
+          } else {
+            const error = new Error(`Tests failed with exit code ${code}`)
+            errorHandler.handleError(error, 'Playwright test execution', false)
+            resolve() // Still resolve to avoid hanging
+          }
+        })
+
+        playwrightProcess.on('error', err => {
+          errorHandler.handleError(err, 'Playwright process', false)
+          resolve() // Still resolve to avoid hanging
+        })
+      })
     } catch (error) {
-      updateStatus('browsers', 'error', `Error checking browser installation: ${error.message}`)
-    }
-
-    // Final summary
-    console.log('\n' + chalk.blue('🩺 Doctor Examination Results:'))
-
-    const errorCount = Object.values(checkResults).filter(r => r.status === 'error').length
-    const warningCount = Object.values(checkResults).filter(r => r.status === 'warning').length
-
-    if (errorCount > 0) {
-      console.log(chalk.red(`❌ Found ${errorCount} critical issues that need to be fixed.`))
-    }
-
-    if (warningCount > 0) {
-      console.log(
-        chalk.yellow(`⚠️ Found ${warningCount} warnings that may impact test reliability.`)
-      )
-    }
-
-    if (errorCount === 0 && warningCount === 0) {
-      console.log(chalk.green('✅ All checks passed! Your environment is properly set up.'))
-    } else {
-      console.log(chalk.blue('\nRecommended actions:'))
-      if (!checkResults.configFile.fileExists) {
-        console.log(chalk.yellow('- Run "web3fuzzforge init" to create a configuration file'))
-      }
-      if (checkResults.dependencies.status === 'error') {
-        console.log(chalk.red('- Run "npm install" to fix dependency issues'))
-      }
-      if (checkResults.browsers.status !== 'success') {
-        console.log(chalk.yellow('- Run "npx playwright install" to set up required browsers'))
-      }
+      errorHandler.handleError(error, 'Run command', true)
     }
   })
-
-// Add validate command
-program
-  .command('validate')
-  .description('Validate the configuration file and check for missing templates')
-  .option('-c, --config <path>', 'Path to the configuration file')
-  .action(async (options) => {
-    const configPath = options.config || path.join(process.cwd(), '.web3fuzzforge.json')
-    const { config, isValid, errors, fileExists, parseError } = configValidator.loadAndValidateConfig(configPath)
-    
-    console.log(chalk.blue('Configuration Validation Results:'))
-    console.log(chalk.blue('================================'))
-    
-    if (!fileExists) {
-      console.log(chalk.red(`Configuration file not found: ${configPath}`))
-      console.log(chalk.yellow(`Run 'web3fuzzforge init' to create a default configuration.`))
-      process.exit(1)
-    }
-    
-    if (parseError) {
-      console.log(chalk.red(`Invalid JSON format in ${configPath}`))
-      console.log(chalk.yellow('Please fix the JSON syntax errors.'))
-      process.exit(1)
-    }
-    
-    if (!isValid) {
-      console.log(chalk.red('Configuration validation failed:'))
-      errors.forEach(error => console.log(chalk.red(` - ${error}`)))
-      console.log(chalk.yellow('Using fallback defaults for invalid properties.'))
-    } else {
-      console.log(chalk.green('Configuration is valid! ✓'))
-    }
-    
-    // Check for template files
-    if (config && config.wallet) {
-      const wallet = config.wallet
-      const lang = config.lang || 'js'
-      const templateExt = lang === 'ts' ? 'ts' : 'js'
-      
-      console.log(chalk.blue('\nTemplate Availability:'))
-      console.log(chalk.blue('====================='))
-      
-      // Check connect template
-      const connectExists = checkTemplateExistence(wallet, 'connect', templateExt, false)
-      console.log(`Connect template for ${wallet} (${lang}): ${connectExists ? chalk.green('✓ Available') : chalk.yellow('⚠ Missing')}`)
-      
-      // Check transaction template
-      const txExists = checkTemplateExistence(wallet, 'tx', templateExt, false)
-      console.log(`Transaction template for ${wallet} (${lang}): ${txExists ? chalk.green('✓ Available') : chalk.yellow('⚠ Missing')}`)
-      
-      // Check sign template
-      const signExists = checkTemplateExistence(wallet, 'sign', templateExt, false)
-      console.log(`Sign template for ${wallet} (${lang}): ${signExists ? chalk.green('✓ Available') : chalk.yellow('⚠ Missing')}`)
-    }
-    
-    console.log(chalk.blue('\nNext Steps:'))
-    if (!isValid) {
-      console.log(chalk.yellow(` - Fix configuration issues in ${configPath}`))
-      console.log(chalk.yellow(` - Run 'web3fuzzforge validate' again to verify changes`))
-    } else {
-      console.log(chalk.green(` - Configuration is ready for use`))
-      console.log(chalk.green(` - Run 'web3fuzzforge generate' to create test files`))
-    }
-  })
-
-// Handle unknown commands
-program.on('command:*', operands => {
-  console.error(chalk.red(`Error: Unknown command '${operands[0]}'`))
-  console.log()
-  console.log(chalk.yellow('Available commands:'))
-  console.log(chalk.green('  generate - Generate a test template'))
-  console.log(chalk.green('  ask      - Use AI to generate configuration from a prompt'))
-  console.log(chalk.green('  init     - Initialize a new test project'))
-  console.log(chalk.green('  run      - Run Playwright tests with configuration'))
-  console.log()
-  displayHelp()
-  process.exit(1)
-})
-
-// Show help if no arguments provided
-if (process.argv.length <= 2) {
-  program.help()
-}
-
-program.parse(process.argv)
-
-// Instead, add a function to get the module only when needed:
-function getOpenAIGenerator() {
-  try {
-    return require(path.join(__dirname, '..', 'utils', 'openai-generator'))
-  } catch (error) {
-    console.error(chalk.red(`Error loading OpenAI generator: ${error.message}`))
-    console.log(chalk.yellow('Make sure you have installed the required dependencies:'))
-    console.log(chalk.white('npm install openai dotenv'))
-    process.exit(1)
-  }
-}
-
-// Add mergeReports function
-function mergeReports() {
-  try {
-    console.log(chalk.blue('Merging report files...'))
-    const reportDir = path.join(process.cwd(), 'reports')
-    const outputFile = path.join(reportDir, 'merged-report.html')
-
-    if (!fs.existsSync(reportDir)) {
-      console.log(chalk.yellow(`Reports directory not found: ${reportDir}`))
-      return false
-    }
-
-    const dataDir = path.join(reportDir, 'data')
-    if (!fs.existsSync(dataDir)) {
-      console.log(chalk.yellow(`Reports data directory not found: ${dataDir}`))
-      return false
-    }
-
-    // Implement the report merging logic here
-    console.log(chalk.green(`Reports merged successfully: ${outputFile}`))
-    return true
-  } catch (error) {
-    console.error(chalk.red(`Error merging reports: ${error.message}`))
-    return false
-  }
-}

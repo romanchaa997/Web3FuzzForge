@@ -1,0 +1,186 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@chainsafe/dappeteer": {
+      "name": "@chainsafe/dappeteer",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "serve-handler"
+      ],
+      "effects": [
+        "Web3FuzzForge"
+      ],
+      "range": ">=4.0.0-rc.0",
+      "nodes": [
+        "node_modules/@chainsafe/dappeteer"
+      ],
+      "fixAvailable": false
+    },
+    "ethers": {
+      "name": "ethers",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "ws"
+      ],
+      "effects": [],
+      "range": "6.0.0-beta.1 - 6.13.0",
+      "nodes": [
+        "node_modules/ethers"
+      ],
+      "fixAvailable": {
+        "name": "ethers",
+        "version": "6.13.7",
+        "isSemVerMajor": false
+      }
+    },
+    "minimatch": {
+      "name": "minimatch",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1096485,
+          "name": "minimatch",
+          "dependency": "minimatch",
+          "title": "minimatch ReDoS vulnerability",
+          "url": "https://github.com/advisories/GHSA-f8q6-p94x-37v3",
+          "severity": "high",
+          "cwe": [
+            "CWE-400",
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<3.0.5"
+        }
+      ],
+      "effects": [
+        "serve-handler"
+      ],
+      "range": "<3.0.5",
+      "nodes": [
+        "node_modules/minimatch"
+      ],
+      "fixAvailable": false
+    },
+    "path-to-regexp": {
+      "name": "path-to-regexp",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1101848,
+          "name": "path-to-regexp",
+          "dependency": "path-to-regexp",
+          "title": "path-to-regexp outputs backtracking regular expressions",
+          "url": "https://github.com/advisories/GHSA-9wv6-86v2-598j",
+          "severity": "high",
+          "cwe": [
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=2.0.0 <3.3.0"
+        }
+      ],
+      "effects": [
+        "serve-handler"
+      ],
+      "range": "2.0.0 - 3.2.0",
+      "nodes": [
+        "node_modules/path-to-regexp"
+      ],
+      "fixAvailable": false
+    },
+    "serve-handler": {
+      "name": "serve-handler",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "minimatch",
+        "path-to-regexp"
+      ],
+      "effects": [
+        "@chainsafe/dappeteer"
+      ],
+      "range": "<=6.1.5",
+      "nodes": [
+        "node_modules/serve-handler"
+      ],
+      "fixAvailable": false
+    },
+    "Web3FuzzForge": {
+      "name": "Web3FuzzForge",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@chainsafe/dappeteer"
+      ],
+      "effects": [],
+      "range": "",
+      "nodes": [
+        "node_modules/Web3FuzzForge"
+      ],
+      "fixAvailable": false
+    },
+    "ws": {
+      "name": "ws",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1098392,
+          "name": "ws",
+          "dependency": "ws",
+          "title": "ws affected by a DoS when handling a request with many HTTP headers",
+          "url": "https://github.com/advisories/GHSA-3h5v-q93c-6h6q",
+          "severity": "high",
+          "cwe": [
+            "CWE-476"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=8.0.0 <8.17.1"
+        }
+      ],
+      "effects": [
+        "ethers"
+      ],
+      "range": "8.0.0 - 8.17.0",
+      "nodes": [
+        "node_modules/ethers/node_modules/ws"
+      ],
+      "fixAvailable": {
+        "name": "ethers",
+        "version": "6.13.7",
+        "isSemVerMajor": false
+      }
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 7,
+      "critical": 0,
+      "total": 7
+    },
+    "dependencies": {
+      "prod": 181,
+      "dev": 249,
+      "optional": 2,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 431
+    }
+  }
+}

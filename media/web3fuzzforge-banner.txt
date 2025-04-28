@@ -1,0 +1,19 @@
+HOW TO GENERATE THE BANNER IMAGE
+
+1. Open the HTML file at temp/banner.html in a web browser
+2. Take a screenshot of the banner (size 1200x300px)
+3. Save the screenshot as media/web3fuzzforge-banner.png
+4. Use this image in your README
+
+The banner features:
+- Gradient blue background
+- Project name and tagline
+- Three icons representing key features:
+  - ⚡ (Speed/Performance)
+  - 🛡️ (Security)
+  - 🔍 (Testing/Inspection)
+
+Alternatively, you can use any of the existing screenshots in the media folder, such as:
+- metamask-transaction-test.png 
+- custom-metamask-test.png
+- metamask-connection-test.png 

@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="gradientFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3778FF" />
+      <stop offset="100%" stop-color="#6147FF" />
+    </linearGradient>
+    <linearGradient id="gradientText" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3778FF" />
+      <stop offset="50%" stop-color="#6147FF" />
+      <stop offset="100%" stop-color="#B947FF" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#19191F" />
+  
+  <!-- Background pattern - hexagonal network -->
+  <path d="M0 0 L1200 0 L1200 630 L0 630 Z" fill="#19191F" />
+  <g opacity="0.1">
+    <path d="M100 100 L200 150 L300 100 L400 150 L500 100 L600 150 L700 100 L800 150 L900 100 L1000 150 L1100 100" stroke="#3778FF" stroke-width="2" />
+    <path d="M100 200 L200 250 L300 200 L400 250 L500 200 L600 250 L700 200 L800 250 L900 200 L1000 250 L1100 200" stroke="#3778FF" stroke-width="2" />
+    <path d="M100 300 L200 350 L300 300 L400 350 L500 300 L600 350 L700 300 L800 350 L900 300 L1000 350 L1100 300" stroke="#3778FF" stroke-width="2" />
+    <path d="M100 400 L200 450 L300 400 L400 450 L500 400 L600 450 L700 400 L800 450 L900 400 L1000 450 L1100 400" stroke="#3778FF" stroke-width="2" />
+    <path d="M100 500 L200 550 L300 500 L400 550 L500 500 L600 550 L700 500 L800 550 L900 500 L1000 550 L1100 500" stroke="#3778FF" stroke-width="2" />
+    
+    <path d="M150 50 L150 580" stroke="#6147FF" stroke-width="1.5" />
+    <path d="M250 50 L250 580" stroke="#6147FF" stroke-width="1.5" />
+    <path d="M350 50 L350 580" stroke="#6147FF" stroke-width="1.5" />
+    <path d="M450 50 L450 580" stroke="#6147FF" stroke-width="1.5" />
+    <path d="M550 50 L550 580" stroke="#6147FF" stroke-width="1.5" />
+    <path d="M650 50 L650 580" stroke="#6147FF" stroke-width="1.5" />
+    <path d="M750 50 L750 580" stroke="#6147FF" stroke-width="1.5" />
+    <path d="M850 50 L850 580" stroke="#6147FF" stroke-width="1.5" />
+    <path d="M950 50 L950 580" stroke="#6147FF" stroke-width="1.5" />
+    <path d="M1050 50 L1050 580" stroke="#6147FF" stroke-width="1.5" />
+  </g>
+  
+  <!-- Logo (larger version) -->
+  <g transform="translate(150, 200) scale(2)">
+    <!-- Shield base -->
+    <path d="M50 10L85 20V45C85 65 70 80 50 90C30 80 15 65 15 45V20L50 10Z" fill="url(#gradientFill)" />
+    <!-- Web3 network lines -->
+    <path d="M35 50L50 35L65 50L50 65L35 50Z" stroke="white" stroke-width="2.5" fill="none" />
+    <!-- Lock/security symbol -->
+    <path d="M42 58H58V45C58 38.5 54.5 33 50 33C45.5 33 42 38.5 42 45V58Z" stroke="white" stroke-width="2.5" fill="none" />
+    <circle cx="50" cy="52" r="3" fill="white" />
+    <rect x="48" y="52" width="4" height="10" rx="1" fill="white" />
+  </g>
+  
+  <!-- Text -->
+  <text x="400" y="250" font-family="Arial, sans-serif" font-weight="bold" font-size="72" fill="url(#gradientText)">Web3FuzzForge</text>
+  <text x="400" y="320" font-family="Arial, sans-serif" font-size="32" fill="white">Security Testing Toolkit for Web3</text>
+  
+  <!-- Tagline -->
+  <text x="400" y="380" font-family="Arial, sans-serif" font-size="24" fill="#CCCCCC">Automate • Test • Secure</text>
+</svg> 

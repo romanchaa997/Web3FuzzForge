@@ -1,3 +1,13 @@
+/**
+ * Playwright Configuration for Web3FuzzForge
+ * 
+ * This configuration sets up the test environment for Web3 testing,
+ * including options for different browsers, viewport settings,
+ * timeout controls, and reporting options.
+ *
+ * @see https://playwright.dev/docs/test-configuration
+ */
+
 // @ts-check
 const { defineConfig, devices } = require('@playwright/test')
 const path = require('path')
@@ -37,35 +47,45 @@ const testConfig = getTestModeConfig()
 
 /**
  * @see https://playwright.dev/docs/test-configuration
+ * @type {import('@playwright/test').PlaywrightTestConfig}
  */
-module.exports = defineConfig({
-  // Look for tests in the tests directory
-  testDir: './tests',
+const config = {
+  // Test directory and test file pattern
+  testDir: './',
+  testMatch: '**/*.test.js',
+  
+  // Timeout settings
+  timeout: 60000,      // Each test has 60 seconds to complete
+  expect: {
+    timeout: 10000,    // Wait up to 10 seconds for expect() conditions
+  },
 
-  // Maximum time one test can run for
-  timeout: 60 * 1000,
+  // Common test settings
+  fullyParallel: false,  // Tests in a single file are not run in parallel
+  forbidOnly: !!process.env.CI,  // Fail if test.only is in the source code when running in CI
+  retries: process.env.CI ? 2 : 0,  // Retry failed tests only in CI environment
+  workers: process.env.CI ? 1 : undefined,  // Set number of workers for parallel execution
+  reporter: [
+    ['html', { open: 'never', outputFolder: 'playwright-report' }],  // HTML report
+    ['list']  // Console output
+  ],
 
-  // Fail the build on CI if you accidentally left test.only in the source code
-  forbidOnly: !!process.env.CI,
-
-  // Retry on CI only
-  retries: process.env.CI ? 2 : 0,
-
-  // Opt out of parallel tests on CI
-  workers: process.env.CI ? 1 : undefined,
-
-  // Reporter to use
-  reporter: process.env.CI
-    ? [['html', { outputFolder: 'reports', open: 'never' }], ['list']]
-    : [['html', { outputFolder: 'reports', open: 'on-failure' }], ['list']],
-
-  // Shared settings for all the projects below
+  // Browser configurations for tests
   use: {
+    // Collecting trace on failure helps with debugging
+    trace: 'on-first-retry',  
+    
+    // Browser viewport size
+    viewport: { width: 1280, height: 720 },
+    
+    // Maximum time for each action to complete
+    actionTimeout: 20000,
+    
+    // Maximum time for each navigation to complete
+    navigationTimeout: 30000,
+
     // Base URL to use in actions like `await page.goto('/')`
     baseURL: testConfig.selfContained ? undefined : testConfig.targetUrl || undefined,
-
-    // Collect trace when retrying the failed test
-    trace: 'retain-on-failure',
 
     // Take screenshot on test failure
     screenshot: 'only-on-failure',
@@ -74,19 +94,43 @@ module.exports = defineConfig({
     video: 'on-first-retry',
   },
 
-  // Configure projects for major browsers
+  // Configure projects for different browsers
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        // Settings for Web3 testing with MetaMask
+        launchOptions: {
+          args: [
+            '--disable-web-security',
+            '--disable-features=IsolateOrigins,site-per-process',
+            '--allow-insecure-localhost',
+          ]
+        }
+      },
     },
+    /*
+    // Uncomment to enable Firefox testing
+    {
+      name: 'firefox',
+      use: {
+        ...devices['Desktop Firefox'],
+      },
+    },
+    
+    // Uncomment to enable WebKit (Safari) testing
+    {
+      name: 'webkit',
+      use: {
+        ...devices['Desktop Safari'],
+      },
+    },
+    */
   ],
 
   // Folder for test artifacts like screenshots, videos, traces, etc.
   outputDir: 'test-output/',
+}
 
-  // Time to wait for assertions to pass
-  expect: {
-    timeout: 10000,
-  },
-})
+module.exports = defineConfig(config)

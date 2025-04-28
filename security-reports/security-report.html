@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Vulnerability Report</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 20px; color: #333; }
+    h1, h2, h3 { color: #2c3e50; }
+    h1 { border-bottom: 2px solid #eaecef; padding-bottom: 10px; }
+    h2 { border-bottom: 1px solid #eaecef; padding-bottom: 8px; margin-top: 30px; }
+    h3 { margin-top: 25px; }
+    code { background-color: #f5f5f5; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+    pre { background-color: #f5f5f5; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    pre code { background-color: transparent; padding: 0; }
+    table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+    th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+    th { background-color: #f5f5f5; }
+    .critical { color: #e74c3c; }
+    .high { color: #e67e22; }
+    .moderate { color: #f39c12; }
+    .low { color: #3498db; }
+    .info { color: #2ecc71; }
+  </style>
+</head>
+<body>
+<h1>Security Vulnerability Report</h1><br><br><strong>Generated:</strong> 2025-04-27 16:07:15<br><br><h2>Overview</h2><br><br>This report contains security vulnerabilities detected in the project dependencies.<br><br><h2>NPM Audit Results</h2><br><br><h3>Vulnerabilities by Severity</h3><br><br><td>Severity</td> Count |
+|----------|-------|
+<td>⚠️ <span class="high">HIGH</span></td> 7 |<br><br><h3>Detailed Findings</h3><br><br><h3>⚠️ @chainsafe/dappeteer</h3><br><br>- <strong>Severity:</strong> <span class="high">HIGH</span>
+- <strong>Vulnerable Versions:</strong> >=4.0.0-rc.0
+- <strong>Fixed Version:</strong> No fix available<br><br>No detailed information available.<br><br><h3>⚠️ ethers</h3><br><br>- <strong>Severity:</strong> <span class="high">HIGH</span>
+- <strong>Vulnerable Versions:</strong> 6.0.0-beta.1 - 6.13.0
+- <strong>Fixed Version:</strong> 6.13.7<br><br>No detailed information available.<br><br>#### Remediation<br><br><pre><code>npm install ethers@6.13.7</code></pre><br><br><h3>⚠️ minimatch</h3><br><br>- <strong>Severity:</strong> <span class="high">HIGH</span>
+- <strong>Vulnerable Versions:</strong> <3.0.5
+- <strong>Fixed Version:</strong> No fix available<br><br>No detailed information available.<br><br><h3>⚠️ path-to-regexp</h3><br><br>- <strong>Severity:</strong> <span class="high">HIGH</span>
+- <strong>Vulnerable Versions:</strong> 2.0.0 - 3.2.0
+- <strong>Fixed Version:</strong> No fix available<br><br>No detailed information available.<br><br><h3>⚠️ serve-handler</h3><br><br>- <strong>Severity:</strong> <span class="high">HIGH</span>
+- <strong>Vulnerable Versions:</strong> <=6.1.5
+- <strong>Fixed Version:</strong> No fix available<br><br>No detailed information available.<br><br><h3>⚠️ Web3FuzzForge</h3><br><br>- <strong>Severity:</strong> <span class="high">HIGH</span>
+- <strong>Vulnerable Versions:</strong> Not specified
+- <strong>Fixed Version:</strong> No fix available<br><br>No detailed information available.<br><br><h3>⚠️ ws</h3><br><br>- <strong>Severity:</strong> <span class="high">HIGH</span>
+- <strong>Vulnerable Versions:</strong> 8.0.0 - 8.17.0
+- <strong>Fixed Version:</strong> 6.13.7<br><br>No detailed information available.<br><br>#### Remediation<br><br><pre><code>npm install ws@6.13.7</code></pre><br><br><h2>Custom Dependency Check Results</h2><br><br>No additional vulnerabilities found via custom dependency checks.<br><br><h2>Special Focus: @chainsafe/dappeteer</h2><br><br><h3>🔍 Custom Implementation Status</h3><br><br>The project includes a custom wallet automation implementation to replace @chainsafe/dappeteer:<br><br>- Custom implementation: <code>src/utils/custom-wallet-automation.js</code>
+- Migration guide: <code>src/utils/SECURITY.md</code><br><br><h3>Migration Recommendations</h3><br><br>1. Use the transitional wrapper: <code>require('../src/utils/dappeteer-wrapper')</code>
+2. Test with custom implementation: <code>require('../src/utils/custom-wallet-automation')</code>
+3. Remove @chainsafe/dappeteer dependency once fully migrated<br><br><h2>Next Steps</h2><br><br>1. Address critical and high severity vulnerabilities first
+2. Run <code>npm run security:fix</code> to apply automatic fixes
+3. Test thoroughly after applying each fix
+4. Complete migration to the custom wallet automation implementation
+
+</body>
+</html>

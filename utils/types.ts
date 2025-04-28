@@ -104,7 +104,7 @@ export interface WalletMockOptions {
  */
 declare global {
   interface Window {
-    ethereum: EthereumProvider & {
+    ethereum?: EthereumProvider & {
       isMetaMask?: boolean;
       isCoinbaseWallet?: boolean;
       isPhantom?: boolean;

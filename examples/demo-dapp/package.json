@@ -1,0 +1,25 @@
+{
+  "name": "web3-demo-dapp",
+  "version": "1.0.0",
+  "description": "Demo dApp for Web3 Security Test Kit",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "parcel src/index.html",
+    "build": "parcel build src/index.html"
+  },
+  "dependencies": {
+    "ethers": "^6.11.1",
+    "web3": "^4.5.0"
+  },
+  "devDependencies": {
+    "parcel": "^2.10.3"
+  },
+  "keywords": [
+    "web3",
+    "dapp",
+    "testing",
+    "security",
+    "demo"
+  ],
+  "license": "MIT"
+} 
