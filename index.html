@@ -3,105 +3,306 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Web3FuzzForge Demo</title>
+  <title>Web3FuzzForge - Security Testing for Web3 Applications</title>
+  <meta name="description" content="Web3FuzzForge is a security-first test kit that helps identify vulnerabilities in Web3 dApps before attackers do.">
+  <meta property="og:title" content="Web3FuzzForge - Security Testing for Web3 Applications">
+  <meta property="og:description" content="Secure your Web3 dApps with automated fuzzing and vulnerability detection.">
+  <meta property="og:image" content="assets/img/web3fuzzforge-banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <style>
-    .gradient-bg {
-      background: linear-gradient(135deg, #2E3A59 0%, #1E293B 100%);
+    :root {
+      --primary-color: #3778FF;  /* Primary Blue */
+      --secondary-color: #6147FF; /* Secondary Purple */
+      --accent-color: #B947FF; /* Accent Pink */
+      --dark-bg: #19191F; /* Dark background */
+      --darker-bg: #121216; /* Darker sections */
+      --text-color: #F7F9FC; /* Main text */
+      --text-secondary: #aaaaaa; /* Secondary text */
+      --success-color: #2ECC71; /* Success messages */
+      --warning-color: #F39C12; /* Warnings */
+      --error-color: #E74C3C; /* Error messages */
+      --info-color: #3498DB; /* Information */
     }
-    .code-window {
-      background-color: #1E293B;
-      border-radius: 0.5rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    
+    body {
+      background-color: var(--dark-bg);
+      color: var(--text-color);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+    }
+    
+    .gradient-text {
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .primary-btn {
+      background-color: var(--primary-color);
+      color: var(--text-color);
+      transition: all 0.3s ease;
+    }
+    
+    .primary-btn:hover {
+      background-color: #2967E8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(55, 120, 255, 0.3);
+    }
+    
+    .secondary-btn {
+      background-color: var(--secondary-color);
+      color: var(--text-color);
+      transition: all 0.3s ease;
+    }
+    
+    .secondary-btn:hover {
+      background-color: #5138E0;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(97, 71, 255, 0.3);
+    }
+    
+    .outline-btn {
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+      background-color: transparent;
+      transition: all 0.3s ease;
+    }
+    
+    .outline-btn:hover {
+      background-color: rgba(55, 120, 255, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .card {
+      background-color: rgba(25, 25, 31, 0.7);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
       overflow: hidden;
     }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .feature-card {
+      border-left: 4px solid var(--primary-color);
+    }
+    
+    .feature-card:nth-child(2) {
+      border-left-color: var(--secondary-color);
+    }
+    
+    .feature-card:nth-child(3) {
+      border-left-color: var(--accent-color);
+    }
+    
+    .code-window {
+      background-color: var(--darker-bg);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+    
     .code-header {
-      background-color: #273344;
-      padding: 0.5rem 1rem;
+      background-color: rgba(55, 120, 255, 0.1);
+      padding: 0.75rem 1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border-bottom: 1px solid rgba(55, 120, 255, 0.2);
     }
+    
     .code-dots {
       display: flex;
       gap: 0.5rem;
     }
+    
     .dot {
       width: 0.75rem;
       height: 0.75rem;
       border-radius: 50%;
     }
+    
     .code-content {
-      padding: 1rem;
+      padding: 1.5rem;
       overflow-x: auto;
       font-family: 'Courier New', monospace;
-      color: #E2E8F0;
+      color: var(--text-color);
+      line-height: 1.6;
     }
+    
     .keyword {
       color: #FF79C6;
     }
+    
     .string {
       color: #F1FA8C;
     }
+    
     .comment {
       color: #6272A4;
     }
+    
     .function {
       color: #50FA7B;
     }
+    
+    .alert {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+    
+    .alert-icon {
+      margin-right: 1rem;
+      font-size: 1.5rem;
+    }
+    
+    .alert-success {
+      background-color: rgba(46, 204, 113, 0.1);
+      border-left: 4px solid var(--success-color);
+    }
+    
+    .alert-warning {
+      background-color: rgba(243, 156, 18, 0.1);
+      border-left: 4px solid var(--warning-color);
+    }
+    
+    .alert-error {
+      background-color: rgba(231, 76, 60, 0.1);
+      border-left: 4px solid var(--error-color);
+    }
+    
+    .alert-info {
+      background-color: rgba(52, 152, 219, 0.1);
+      border-left: 4px solid var(--info-color);
+    }
+    
+    nav a {
+      position: relative;
+      transition: color 0.3s ease;
+    }
+    
+    nav a:after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background-color: var(--primary-color);
+      transition: width 0.3s ease;
+    }
+    
+    nav a:hover:after {
+      width: 100%;
+    }
+    
+    .testimonial-avatar {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .testimonial-avatar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+      opacity: 0.8;
+      border-radius: 50%;
+    }
   </style>
 </head>
-<body class="gradient-bg min-h-screen text-white">
+<body class="gradient-bg min-h-screen">
   <header class="container mx-auto py-6 px-4">
-    <div class="flex justify-between items-center">
-      <div class="flex items-center space-x-4">
-        <img src="assets/img/web3fuzzforge-logo.svg" alt="Web3FuzzForge Logo" class="w-12 h-12">
+    <div class="flex flex-col md:flex-row justify-between items-center">
+      <div class="flex items-center space-x-4 mb-4 md:mb-0">
+        <img src="assets/img/logo.svg" alt="Web3FuzzForge Logo" class="w-12 h-12">
         <h1 class="text-2xl font-bold">Web3FuzzForge</h1>
       </div>
-      <nav>
-        <ul class="flex space-x-6">
-          <li><a href="#features" class="hover:text-blue-300">Features</a></li>
-          <li><a href="#demo" class="hover:text-blue-300">Demo</a></li>
-          <li><a href="#docs" class="hover:text-blue-300">Docs</a></li>
-          <li><a href="https://github.com/romanchaa997/Web3FuzzForge" target="_blank" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">GitHub</a></li>
+      <nav class="w-full md:w-auto">
+        <ul class="flex flex-wrap justify-center md:justify-end space-x-3 md:space-x-6">
+          <li><a href="#features" class="px-2 py-1 hover:text-primary-color">Features</a></li>
+          <li><a href="#demo" class="px-2 py-1 hover:text-primary-color">Demo</a></li>
+          <li><a href="#docs" class="px-2 py-1 hover:text-primary-color">Docs</a></li>
+          <li><a href="#roadmap" class="px-2 py-1 hover:text-primary-color">Roadmap</a></li>
+          <li><a href="https://github.com/romanchaa997/Web3FuzzForge" target="_blank" class="primary-btn px-4 py-2 rounded-lg ml-2">GitHub</a></li>
         </ul>
       </nav>
     </div>
   </header>
 
   <main class="container mx-auto py-8 px-4">
-    <section class="text-center mb-16">
-      <h2 class="text-4xl font-bold mb-4">Secure your Web3 dApps with automated fuzzing</h2>
-      <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">Web3FuzzForge is a security-first test kit that helps you identify vulnerabilities before attackers do.</p>
-      <div class="flex justify-center space-x-4">
-        <a href="#demo" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-bold">Try Demo</a>
-        <a href="https://github.com/romanchaa997/Web3FuzzForge" target="_blank" class="bg-gray-700 hover:bg-gray-800 px-6 py-3 rounded-lg font-bold">View on GitHub</a>
+    <section class="text-center mb-16 py-12">
+      <h2 class="text-4xl md:text-5xl font-bold mb-6"><span class="gradient-text">Secure your Web3 dApps</span><br>with automated fuzzing</h2>
+      <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">Web3FuzzForge is a security-first test kit that helps you identify vulnerabilities before attackers do.</p>
+      <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+        <a href="#demo" class="primary-btn px-6 py-3 rounded-lg font-bold text-center">Try Demo</a>
+        <a href="https://github.com/romanchaa997/Web3FuzzForge" target="_blank" class="outline-btn px-6 py-3 rounded-lg font-bold text-center">View on GitHub</a>
+      </div>
+      <div class="mt-12">
+        <img src="assets/img/web3fuzzforge-banner.png" alt="Web3FuzzForge Demo" class="mx-auto rounded-lg shadow-xl max-w-full">
       </div>
     </section>
 
-    <section id="features" class="mb-16">
-      <h2 class="text-3xl font-bold mb-8 text-center">Features</h2>
+    <section id="features" class="mb-16 py-12">
+      <h2 class="text-3xl font-bold mb-8 text-center gradient-text">Features</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="bg-gray-800 p-6 rounded-lg">
-          <div class="text-blue-400 text-4xl mb-4">🔍</div>
+        <div class="card feature-card p-6">
+          <div class="text-primary-color text-4xl mb-4">🔍</div>
           <h3 class="text-xl font-bold mb-2">Multi-Wallet Support</h3>
           <p class="text-gray-300">Test with MetaMask, WalletConnect, Coinbase, Phantom, and more wallets</p>
+          <ul class="mt-4 text-gray-400 space-y-1">
+            <li>• Automatic wallet extension control</li>
+            <li>• Cross-browser compatibility</li>
+            <li>• Session persistence</li>
+          </ul>
         </div>
-        <div class="bg-gray-800 p-6 rounded-lg">
-          <div class="text-blue-400 text-4xl mb-4">🛡️</div>
+        <div class="card feature-card p-6">
+          <div class="text-secondary-color text-4xl mb-4">🛡️</div>
           <h3 class="text-xl font-bold mb-2">Security Test Generation</h3>
           <p class="text-gray-300">Built-in fuzzing support and vulnerability detection</p>
+          <ul class="mt-4 text-gray-400 space-y-1">
+            <li>• Unlimited approval detection</li>
+            <li>• Transaction flow fuzzing</li>
+            <li>• Malicious input testing</li>
+          </ul>
         </div>
-        <div class="bg-gray-800 p-6 rounded-lg">
-          <div class="text-blue-400 text-4xl mb-4">📸</div>
+        <div class="card feature-card p-6">
+          <div class="text-accent-color text-4xl mb-4">📸</div>
           <h3 class="text-xl font-bold mb-2">Wallet Snapshots</h3>
           <p class="text-gray-300">Save and restore wallet states for complex test scenarios</p>
+          <ul class="mt-4 text-gray-400 space-y-1">
+            <li>• Deterministic test runs</li>
+            <li>• Multiple account states</li>
+            <li>• Cross-network testing</li>
+          </ul>
         </div>
       </div>
     </section>
 
-    <section id="demo" class="mb-16">
-      <h2 class="text-3xl font-bold mb-8 text-center">Interactive Demo</h2>
+    <div class="alert alert-info mb-12">
+      <div class="alert-icon">ℹ️</div>
+      <div>
+        <strong>Beta Release:</strong> Web3FuzzForge is in beta. We welcome feedback and contributions to improve the tool.
+      </div>
+    </div>
+
+    <section id="demo" class="mb-16 py-12">
+      <h2 class="text-3xl font-bold mb-8 text-center gradient-text">Interactive Demo</h2>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
           <h3 class="text-2xl font-bold mb-4">Generate Security Tests</h3>
@@ -120,11 +321,11 @@
   --out ./tests/security-tx-test.js --fuzz</pre>
             </div>
           </div>
-          <button id="generateBtn" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded w-full">Generate Test</button>
+          <button id="generateBtn" class="primary-btn px-4 py-2 rounded w-full">Generate Test</button>
         </div>
         <div>
           <h3 class="text-2xl font-bold mb-4">Output</h3>
-          <div class="code-window h-64">
+          <div class="code-window h-72">
             <div class="code-header">
               <span>security-tx-test.js</span>
               <div class="code-dots">
@@ -139,59 +340,75 @@
           </div>
         </div>
       </div>
+      <div class="mt-12 text-center">
+        <a href="#" class="flex justify-center items-center">
+          <img src="assets/img/demo.gif" alt="Web3FuzzForge Demo" class="rounded-lg shadow-xl mx-auto max-w-full">
+        </a>
+      </div>
     </section>
 
-    <section id="docs" class="mb-16">
-      <h2 class="text-3xl font-bold mb-8 text-center">Quick Start</h2>
-      <div class="code-window mb-4">
-        <div class="code-header">
-          <span>Installation</span>
-          <div class="code-dots">
-            <div class="dot bg-red-500"></div>
-            <div class="dot bg-yellow-500"></div>
-            <div class="dot bg-green-500"></div>
+    <section id="docs" class="mb-16 py-12">
+      <h2 class="text-3xl font-bold mb-8 text-center gradient-text">Quick Start</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <div class="code-window mb-4">
+            <div class="code-header">
+              <span>Installation</span>
+              <div class="code-dots">
+                <div class="dot bg-red-500"></div>
+                <div class="dot bg-yellow-500"></div>
+                <div class="dot bg-green-500"></div>
+              </div>
+            </div>
+            <div class="code-content">
+              <pre><span class="keyword">$</span> npm install web3fuzzforge</pre>
+            </div>
           </div>
         </div>
-        <div class="code-content">
-          <pre><span class="keyword">$</span> npm install web3fuzzforge</pre>
-        </div>
-      </div>
-      <div class="code-window">
-        <div class="code-header">
-          <span>Basic Usage</span>
-          <div class="code-dots">
-            <div class="dot bg-red-500"></div>
-            <div class="dot bg-yellow-500"></div>
-            <div class="dot bg-green-500"></div>
-          </div>
-        </div>
-        <div class="code-content">
-          <pre><span class="comment"># Generate a wallet connection test</span>
+        <div>
+          <div class="code-window">
+            <div class="code-header">
+              <span>Basic Usage</span>
+              <div class="code-dots">
+                <div class="dot bg-red-500"></div>
+                <div class="dot bg-yellow-500"></div>
+                <div class="dot bg-green-500"></div>
+              </div>
+            </div>
+            <div class="code-content">
+              <pre><span class="comment"># Generate a wallet connection test</span>
 <span class="keyword">$</span> web3fuzzforge <span class="function">generate</span> connect --wallet metamask --out ./tests/connection-test.js
 
 <span class="comment"># Run tests with a browser UI</span>
 <span class="keyword">$</span> web3fuzzforge <span class="function">run</span> --headed</pre>
+            </div>
+          </div>
         </div>
+      </div>
+      <div class="text-center mt-8">
+        <a href="docs/quickstart" class="secondary-btn px-6 py-3 rounded-lg font-bold inline-block">Full Documentation</a>
       </div>
     </section>
 
-    <section id="testimonials" class="mb-16">
-      <h2 class="text-3xl font-bold mb-8 text-center">What Users Say</h2>
+    <section id="testimonials" class="mb-16 py-12">
+      <h2 class="text-3xl font-bold mb-8 text-center gradient-text">What Users Say</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="bg-gray-800 p-6 rounded-lg">
-          <p class="italic mb-4">"Web3FuzzForge caught several edge case vulnerabilities in our dApp that our regular testing missed. Highly recommended for any serious Web3 project."</p>
+        <div class="card p-6 relative">
+          <div class="absolute top-4 right-4 text-4xl opacity-20">"</div>
+          <p class="italic mb-6 relative z-10">Web3FuzzForge caught several edge case vulnerabilities in our dApp that our regular testing missed. Highly recommended for any serious Web3 project.</p>
           <div class="flex items-center">
-            <div class="w-10 h-10 bg-blue-500 rounded-full mr-4"></div>
+            <div class="testimonial-avatar w-12 h-12 rounded-full mr-4 bg-gray-700"></div>
             <div>
               <p class="font-bold">Alex Chen</p>
               <p class="text-gray-400">CTO, DeFiSecure</p>
             </div>
           </div>
         </div>
-        <div class="bg-gray-800 p-6 rounded-lg">
-          <p class="italic mb-4">"The ability to automate wallet interaction testing saved us countless hours. The security test generation feature is a game-changer."</p>
+        <div class="card p-6 relative">
+          <div class="absolute top-4 right-4 text-4xl opacity-20">"</div>
+          <p class="italic mb-6 relative z-10">The ability to automate wallet interaction testing saved us countless hours. The security test generation feature is a game-changer.</p>
           <div class="flex items-center">
-            <div class="w-10 h-10 bg-purple-500 rounded-full mr-4"></div>
+            <div class="testimonial-avatar w-12 h-12 rounded-full mr-4 bg-gray-700"></div>
             <div>
               <p class="font-bold">Maria Lopez</p>
               <p class="text-gray-400">Lead Developer, Web3Connect</p>
@@ -200,25 +417,107 @@
         </div>
       </div>
     </section>
+
+    <section id="roadmap" class="mb-16 py-12">
+      <h2 class="text-3xl font-bold mb-8 text-center gradient-text">Future Improvements</h2>
+      <div class="relative">
+        <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-primary-color to-accent-color"></div>
+        <div class="space-y-16 relative">
+          <div class="card p-6 md:w-2/3 md:ml-auto">
+            <div class="absolute -left-3 top-1/2 transform -translate-y-1/2 w-6 h-6 rounded-full bg-primary-color"></div>
+            <h3 class="text-xl font-bold mb-2">Phase 1 (Q3 2023): Foundation Improvements</h3>
+            <ul class="space-y-2 text-gray-300">
+              <li>• Advanced wallet state management</li>
+              <li>• Expanded multi-chain support</li>
+              <li>• Enhanced reporting with security scoring</li>
+            </ul>
+          </div>
+          <div class="card p-6 md:w-2/3">
+            <div class="absolute -left-3 top-1/2 transform -translate-y-1/2 w-6 h-6 rounded-full bg-secondary-color"></div>
+            <h3 class="text-xl font-bold mb-2">Phase 2 (Q4 2023): Advanced Features</h3>
+            <ul class="space-y-2 text-gray-300">
+              <li>• AI-powered vulnerability detection</li>
+              <li>• Custom security rule definitions</li>
+              <li>• Integration with security monitoring tools</li>
+            </ul>
+          </div>
+          <div class="card p-6 md:w-2/3 md:ml-auto">
+            <div class="absolute -left-3 top-1/2 transform -translate-y-1/2 w-6 h-6 rounded-full bg-accent-color"></div>
+            <h3 class="text-xl font-bold mb-2">Phase 3 (Q1 2024): Platform Extensions</h3>
+            <ul class="space-y-2 text-gray-300">
+              <li>• Web3FuzzForge cloud service</li>
+              <li>• CI/CD pipeline integration</li>
+              <li>• Specialized toolkit for auditors</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <footer class="bg-gray-900 py-8">
+  <footer class="bg-darker-bg py-12">
     <div class="container mx-auto px-4">
       <div class="flex flex-col md:flex-row justify-between items-center">
-        <div class="flex items-center mb-4 md:mb-0">
-          <img src="assets/img/web3fuzzforge-logo.svg" alt="Web3FuzzForge Logo" class="w-10 h-10 mr-3">
+        <div class="flex items-center mb-6 md:mb-0">
+          <img src="assets/img/logo.svg" alt="Web3FuzzForge Logo" class="w-10 h-10 mr-3">
           <p>© 2023 Web3FuzzForge. MIT License.</p>
         </div>
-        <div class="flex space-x-6">
-          <a href="https://github.com/romanchaa997/Web3FuzzForge" target="_blank" class="hover:text-blue-400">GitHub</a>
-          <a href="#" class="hover:text-blue-400">Documentation</a>
-          <a href="#" class="hover:text-blue-400">Contributors</a>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12 text-center md:text-left">
+          <div>
+            <h3 class="font-bold mb-3">Project</h3>
+            <ul class="space-y-2">
+              <li><a href="https://github.com/romanchaa997/Web3FuzzForge" target="_blank" class="hover:text-primary-color transition-colors">GitHub</a></li>
+              <li><a href="https://gitlab.com/romanchaa997/Web3FuzzForge" target="_blank" class="hover:text-primary-color transition-colors">GitLab</a></li>
+              <li><a href="#" class="hover:text-primary-color transition-colors">Releases</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-bold mb-3">Documentation</h3>
+            <ul class="space-y-2">
+              <li><a href="#" class="hover:text-primary-color transition-colors">Installation</a></li>
+              <li><a href="#" class="hover:text-primary-color transition-colors">API Reference</a></li>
+              <li><a href="#" class="hover:text-primary-color transition-colors">Tutorials</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-bold mb-3">Community</h3>
+            <ul class="space-y-2">
+              <li><a href="#" class="hover:text-primary-color transition-colors">Contributors</a></li>
+              <li><a href="#" class="hover:text-primary-color transition-colors">Discord</a></li>
+              <li><a href="#" class="hover:text-primary-color transition-colors">Twitter</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-bold mb-3">Legal</h3>
+            <ul class="space-y-2">
+              <li><a href="#" class="hover:text-primary-color transition-colors">Privacy</a></li>
+              <li><a href="#" class="hover:text-primary-color transition-colors">Terms</a></li>
+              <li><a href="#" class="hover:text-primary-color transition-colors">License</a></li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
   </footer>
 
   <script>
+    // Fix for navigation links on mobile
+    document.querySelectorAll('nav a').forEach(link => {
+      link.addEventListener('click', function(e) {
+        if (this.getAttribute('href').startsWith('#')) {
+          const targetId = this.getAttribute('href');
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            e.preventDefault();
+            window.scrollTo({
+              top: targetElement.offsetTop - 100,
+              behavior: 'smooth'
+            });
+          }
+        }
+      });
+    });
+    
     document.getElementById('generateBtn').addEventListener('click', function() {
       const outputElement = document.getElementById('outputCode');
       outputElement.innerHTML = '<span class="comment">// Generated Security Fuzzing Test</span>\n' +
@@ -238,6 +537,19 @@
         '  <span class="keyword">await</span> <span class="function">expect</span>(warningElement).<span class="function">toBeVisible</span>();\n' +
         '  <span class="keyword">await</span> <span class="function">expect</span>(warningElement).<span class="function">toContainText</span>(<span class="string">\'unlimited approval\'</span>);\n' +
         '});';
+      
+      // Show success alert
+      const successAlert = document.createElement('div');
+      successAlert.className = 'alert alert-success mt-4';
+      successAlert.innerHTML = '<div class="alert-icon">✅</div><div><strong>Success!</strong> Test generated successfully.</div>';
+      
+      // Add alert after button
+      this.parentNode.appendChild(successAlert);
+      
+      // Remove alert after 3 seconds
+      setTimeout(() => {
+        successAlert.remove();
+      }, 3000);
     });
   </script>
 </body>
