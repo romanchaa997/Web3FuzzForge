@@ -1,81 +1,158 @@
 # Web3FuzzForge Documentation Site
 
-This directory contains the Docusaurus-based documentation site for Web3FuzzForge.
+This directory contains the centralized documentation for the Web3FuzzForge project, built with [Docusaurus](https://docusaurus.io/).
 
-## Local Development
+## 📚 Documentation Overview
+
+Our documentation is organized into the following sections:
+
+- **Introduction** - Overview of Web3FuzzForge and its capabilities
+- **Installation Guide** - Get started with Web3FuzzForge
+- **Quickstart Tutorial** - Create your first tests
+- **Security Testing** - Learn about the security testing capabilities
+- **Wallet Integration** - Connect with real wallets
+- **Mobile Testing** - Test mobile wallet interactions
+- **Cross-Chain Testing** - Test dApps across multiple chains
+- **Vulnerability Categorization** - Understand vulnerability types
+- **Reporting** - Generate and interpret test reports
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (version 16.x or higher)
+- npm (version 7.x or higher)
+
+### Installation
+
+From the main project directory:
 
 ```bash
-# Install dependencies
+# Install documentation site dependencies
+cd docs-site
 npm install
+```
 
-# Start local development server
+### Running the Documentation Site Locally
+
+```bash
+# From the main project directory
+npm run docs
+
+# Or from the docs-site directory
 npm start
 ```
 
-This will start a local development server and open up a browser window. Most changes are reflected live without having to restart the server.
+The documentation site will be available at [http://localhost:3000](http://localhost:3000).
 
-## Building for Production
+## 🛠️ Adding or Modifying Documentation
+
+### Directory Structure
+
+- `/docs` - Main documentation content
+- `/blog` - Blog posts and announcements
+- `/src/pages` - Static pages
+- `/static` - Static assets like images
+- `/sidebars.js` - Configuration for the documentation sidebar
+
+### Adding a New Documentation Page
+
+1. Create a new Markdown file in the appropriate directory under `/docs`
+2. Add frontmatter at the top of the file:
+
+```markdown
+---
+id: page-id
+title: Page Title
+sidebar_label: Menu Label
+slug: /url-path
+---
+
+# Your Content Here
+```
+
+3. Update `sidebars.js` if needed to include your new page
+
+### Adding Images
+
+1. Place images in the `/static/img` directory
+2. Reference them in your Markdown:
+
+```markdown
+![Alt Text](/img/your-image.png)
+```
+
+## 🏗️ Building for Production
+
+To build the documentation site for production:
 
 ```bash
-# Build the site
-npm run build
+# From the main project directory
+npm run docs:build
 
-# Test the build locally
+# Or from the docs-site directory
+npm run build
+```
+
+The build artifacts will be in the `/docs-site/build` directory.
+
+## 🚀 Deployment
+
+### Serving the Built Site Locally
+
+```bash
+# From the main project directory
+npm run docs:serve
+
+# Or from the docs-site directory
 npm run serve
 ```
 
-This command generates static content in the `build` directory that can be served using any static content hosting service.
-
-## Deployment
+### Deploying to GitHub Pages
 
 ```bash
-# Easy deployment script
-./deploy-docs.sh
-```
+# From the main project directory
+npm run docs:deploy
 
-Or manually:
-
-```bash
-GIT_USER=<Your GitHub username> \
-CURRENT_BRANCH=main \
-USE_SSH=true \
+# Or from the docs-site directory
 npm run deploy
 ```
 
-This command is a convenient way to build the website and push to the `gh-pages` branch.
+## ✨ Customization
 
-## Documentation Structure
+### Styling
 
-- **Getting Started**: overview, why-it-matters, installation, quickstart
-- **Reference**: commands-reference, advanced-guides
-- **Wallet Integration**: real-wallet-integration, mobile-wallets, wallet-state-snapshots
-- **Advanced Testing**: cross-chain-testing, security-testing
-- **Reporting**: reporting-overview, vulnerability-categorization
-- **Community**: community-test-examples
+- Edit `/src/css/custom.css` to customize the site appearance
+- Modify theme configuration in `docusaurus.config.js`
 
-## Adding New Documentation
+### Navigation
 
-1. Create new `.md` files in the `docs` directory
-2. Update `sidebars.js` to include your new document
-3. Link to your document from other relevant pages
+- Edit navbar and footer links in `docusaurus.config.js`
+- Modify sidebar structure in `sidebars.js`
 
-## Contributing to Documentation
+## 🤝 Contributing to Documentation
 
-1. Create a new Markdown file in the `docs` directory
-2. Add the frontmatter with `sidebar_position` to control the order
-3. Update the `sidebars.js` file if adding a new section
+1. Create a feature branch for your changes
+2. Make your updates to the documentation
+3. Test locally to ensure everything looks correct
 4. Submit a pull request with your changes
 
-## Customizing the Site
-
-- Edit `docusaurus.config.js` to modify site configuration
-- Customize styling in `src/css/custom.css`
-- Modify the landing page in `src/pages/index.js`
-
-## Documentation Standards
+## 📝 Documentation Style Guide
 
 - Use clear, concise language
-- Include code examples where appropriate
-- Add cross-references to related documentation
-- Use proper Markdown formatting
-- Include images and diagrams when helpful
+- Include code examples when relevant
+- Use headings to organize content
+- Include screenshots for visual elements
+- Link to related documentation pages
+
+## 🔍 Search
+
+The documentation site includes search functionality powered by the browser's local search index. For production deployment, consider configuring Algolia DocSearch in `docusaurus.config.js`.
+
+## 🚨 Need Help?
+
+If you need assistance with the documentation site, please:
+
+1. Check the [Docusaurus documentation](https://docusaurus.io/docs)
+2. Open an issue in the main repository
+3. Reach out on our community channels

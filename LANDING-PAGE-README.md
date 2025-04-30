@@ -79,9 +79,9 @@ The landing page is fully responsive and works on all device sizes:
 ## Future Improvements Section
 
 The landing page includes a timeline of upcoming improvements:
-- Phase 1 (Q3 2023): Foundation Improvements
-- Phase 2 (Q4 2023): Advanced Features
-- Phase 3 (Q1 2024): Platform Extensions
+- Phase 1 (Q3 2025): Foundation Improvements
+- Phase 2 (Q4 2025): Advanced Features
+- Phase 3 (Q1 2025): Platform Extensions
 
 This section should be kept in sync with the actual roadmap in `docs/future-improvements-index.md`.
 

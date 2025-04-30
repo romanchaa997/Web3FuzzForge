@@ -54,6 +54,62 @@ web3fuzzforge run --mock-mode --headed
 web3fuzzforge run --target-url=https://your-dapp.com
 ```
 
+## 📚 Documentation
+
+We've improved our documentation! Visit our comprehensive documentation site for detailed guides, tutorials, and examples:
+
+```bash
+# Start the documentation site locally
+npm run docs
+```
+
+The documentation is now organized into clear sections:
+- Introduction & Overview
+- Installation & Quickstart
+- Security Testing
+- Wallet Integration
+- Mobile Testing
+- Cross-Chain Testing
+- Vulnerability Categorization
+- Reporting
+
+## 📊 Enhanced Reporting
+
+Web3FuzzForge now includes a structured reporting system with vulnerability categorization:
+
+```bash
+# Generate a comprehensive security report
+npm run report:generate
+
+# Export report to different formats
+npm run report:export --format=json,html,pdf
+```
+
+## 📱 Mobile & Cross-Chain Testing
+
+We've expanded support for mobile wallets and cross-chain testing:
+
+```bash
+# Set up mobile testing environment
+npm run mobile:setup
+
+# Set up cross-chain testing environment
+npm run cross-chain:setup
+```
+
+## 🧩 Recent Improvements
+
+We've made several key improvements to Web3FuzzForge:
+
+1. **Centralized Documentation**: All documentation is now available in one place
+2. **Enhanced Test Reporting**: Structured reporting with vulnerability categorization
+3. **Mobile Wallet Testing**: Expanded support for mobile wallet interactions
+4. **Cross-Chain Testing**: Support for testing across multiple blockchain networks
+5. **Community Examples**: Real-world test examples for common vulnerabilities
+6. **Performance Optimization**: Improved test execution speed
+
+For detailed implementation steps, see the [Improvement Guide](./improvement-guide.md).
+
 ## 🔮 Future Improvements
 
 We're continuously improving Web3FuzzForge with a focus on:
@@ -64,12 +120,10 @@ We're continuously improving Web3FuzzForge with a focus on:
 | Phase 2 | Q4 2023 | Advanced Features (Comprehensive Mock System, Test Isolation, Interactive Documentation) |
 | Phase 3 | Q1 2024 | Platform Extensions (Web UI, AI Test Generation, Cross-Chain Support) |
 
-See our [Future Improvements](./docs/future-improvements-index.md) documentation for details.
-
 ## 🧠 Troubleshooting Tips
 - Package Installation Errors? Use `npm run local-install`.
 - UI Visibility Fails? Use `forceShowWalletUI` from /utils/wallet-snapshot.
-- For more help, check our [FAQ](./docs/future-improvements-faq.md).
+- For more help, check the documentation site.
 
 ## 📜 License
 MIT License.

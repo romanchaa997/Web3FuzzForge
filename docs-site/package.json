@@ -1,7 +1,7 @@
 {
   "name": "web3fuzzforge-docs",
   "version": "1.0.0",
-  "private": true,
+  "description": "Comprehensive documentation for Web3FuzzForge",
   "scripts": {
     "start": "docusaurus start",
     "build": "docusaurus build",
@@ -10,16 +10,18 @@
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
-    "write-heading-ids": "docusaurus write-heading-ids",
-    "update-deps": "npm i @docusaurus/core@latest @docusaurus/preset-classic@latest @mdx-js/react@latest --legacy-peer-deps"
+    "write-heading-ids": "docusaurus write-heading-ids"
   },
   "dependencies": {
-    "@docusaurus/core": "^3.7.0",
-    "@docusaurus/preset-classic": "^3.7.0",
-    "@mdx-js/react": "^3.1.0",
+    "@docusaurus/core": "^2.4.1",
+    "@docusaurus/preset-classic": "^2.4.1",
+    "@mdx-js/react": "^1.6.22",
     "clsx": "^1.2.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@docusaurus/module-type-aliases": "^2.4.1"
   },
   "browserslist": {
     "production": [

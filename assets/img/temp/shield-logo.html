@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web3FuzzForge Shield Logo</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Arial', sans-serif;
+            background-color: #1E293B;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .logo-container {
+            width: 240px;
+            height: 240px;
+            background-color: transparent;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .logo-image {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .shield {
+            width: 180px;
+            height: 200px;
+            position: relative;
+        }
+        .shield-outline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            width: 280px;
+        }
+        button {
+            background: #3778FF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #2967E8;
+        }
+        #status {
+            color: white;
+            margin-top: 10px;
+            text-align: center;
+            min-height: 20px;
+        }
+        #save-btn {
+            background: #10B981;
+        }
+        #save-btn:hover {
+            background: #059669;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-container" id="logo-container">
+        <div class="logo-image">
+            <div class="shield">
+                <svg class="shield-outline" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Shield outline -->
+                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="none" stroke="white" stroke-width="1.5"/>
+                    <!-- Lightning bolt -->
+                    <path d="M11 21h-1l1-7h-7l9-14 1 8h7l-10 13z" fill="white"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button id="capture-btn">View in New Tab</button>
+        <button id="save-btn">Save as shield-logo.png</button>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        document.getElementById('capture-btn').addEventListener('click', function() {
+            html2canvas(document.getElementById('logo-container'), {
+                backgroundColor: null
+            }).then(function(canvas) {
+                // Create a new tab with just the image
+                const imageWindow = window.open();
+                imageWindow.document.write('<img src="' + canvas.toDataURL("image/png") + '" alt="Shield Logo"/>');
+                
+                // Show status
+                document.getElementById('status').textContent = 'Logo opened in new tab. Right-click to save.';
+            });
+        });
+        
+        document.getElementById('save-btn').addEventListener('click', function() {
+            html2canvas(document.getElementById('logo-container'), {
+                backgroundColor: null
+            }).then(function(canvas) {
+                // Create a download link
+                const link = document.createElement('a');
+                link.download = 'shield-logo.png';
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+                
+                // Show status
+                document.getElementById('status').textContent = 'Logo saved as shield-logo.png';
+            });
+        });
+    </script>
+</body>
+</html> 

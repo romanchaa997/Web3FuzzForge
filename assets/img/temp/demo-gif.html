@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web3FuzzForge Demo</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #1E293B;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .demo-container {
+            width: 800px;
+            height: 500px;
+            background-color: #2D3748;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+            padding: 20px;
+            color: white;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .steps-container {
+            display: flex;
+            margin-bottom: 30px;
+        }
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background-color: #4A5568;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 10px;
+            z-index: 2;
+            position: relative;
+        }
+        .step.active .step-number {
+            background-color: #60A5FA;
+        }
+        .step-connector {
+            position: absolute;
+            top: 15px;
+            left: calc(50% + 15px);
+            right: calc(50% - 15px);
+            height: 2px;
+            background-color: #4A5568;
+            z-index: 1;
+        }
+        .step:last-child .step-connector {
+            display: none;
+        }
+        .step.active .step-connector {
+            background-color: #60A5FA;
+        }
+        .step-name {
+            font-size: 14px;
+            color: #CBD5E1;
+        }
+        .step.active .step-name {
+            color: white;
+            font-weight: bold;
+        }
+        .content-display {
+            height: 350px;
+            background-color: #1A1F2E;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+        }
+        .screen.active {
+            opacity: 1;
+        }
+        .screen-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: white;
+        }
+        .screen-content {
+            width: 80%;
+            text-align: center;
+        }
+        .code-block {
+            background-color: #2D3748;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .keyword { color: #F687B3; }
+        .function { color: #63B3ED; }
+        .string { color: #68D391; }
+        .comment { color: #718096; }
+        .button {
+            background-color: #60A5FA;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .wallet-ui {
+            width: 300px;
+            height: 200px;
+            background-color: #2D3748;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: left;
+        }
+        .wallet-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .wallet-icon {
+            width: 30px;
+            height: 30px;
+            background-color: #F59E0B;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+        }
+        .result {
+            background-color: #2D3748;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+            width: 90%;
+        }
+        .success {
+            color: #68D391;
+        }
+        .warning {
+            color: #F59E0B;
+        }
+        .error {
+            color: #FC8181;
+        }
+        #screenshot-ui {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+        #screenshot-ui button {
+            width: 100%;
+        }
+        #screenshots {
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .screenshot-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .screenshot-item img {
+            width: 60px;
+            height: 38px;
+            object-fit: cover;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+        .screenshot-item .download-link {
+            color: #60A5FA;
+            text-decoration: none;
+            margin-left: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container" id="demo-container">
+        <div class="header">
+            <h2>Web3FuzzForge Security Testing Demo</h2>
+        </div>
+        
+        <div class="steps-container">
+            <div class="step active" id="step1">
+                <div class="step-number">1</div>
+                <div class="step-connector"></div>
+                <div class="step-name">Generate Test</div>
+            </div>
+            <div class="step" id="step2">
+                <div class="step-number">2</div>
+                <div class="step-connector"></div>
+                <div class="step-name">Connect Wallet</div>
+            </div>
+            <div class="step" id="step3">
+                <div class="step-number">3</div>
+                <div class="step-connector"></div>
+                <div class="step-name">Security Fuzzing</div>
+            </div>
+            <div class="step" id="step4">
+                <div class="step-number">4</div>
+                <div class="step-name">Results</div>
+            </div>
+        </div>
+        
+        <div class="content-display">
+            <div class="screen active" id="screen1">
+                <div class="screen-title">Generating Security Test</div>
+                <div class="screen-content">
+                    <div class="code-block">
+                        <span class="comment">// Generating security test for unlimited approvals</span><br>
+                        <span class="keyword">const</span> { test } = <span class="function">require</span>(<span class="string">'@playwright/test'</span>);<br>
+                        <span class="keyword">const</span> { wallet } = <span class="function">require</span>(<span class="string">'../utils'</span>);<br><br>
+                        test(<span class="string">'Detect unlimited approval vulnerabilities'</span>, <span class="keyword">async</span> ({ page }) => {<br>
+                        &nbsp;&nbsp;<span class="comment">// Test setup and wallet connection</span><br>
+                        &nbsp;&nbsp;<span class="keyword">await</span> page.<span class="function">goto</span>(<span class="string">'https://app.example.com'</span>);<br>
+                        &nbsp;&nbsp;<span class="keyword">await</span> wallet.<span class="function">connect</span>();<br>
+                        &nbsp;&nbsp;<br>
+                        &nbsp;&nbsp;<span class="comment">// Test with fuzzing data...</span><br>
+                        });
+                    </div>
+                    <button class="button" id="nextBtn1">Run Test</button>
+                </div>
+            </div>
+            
+            <div class="screen" id="screen2">
+                <div class="screen-title">Connecting to Wallet</div>
+                <div class="screen-content">
+                    <div class="wallet-ui">
+                        <div class="wallet-header">
+                            <div class="wallet-icon">🦊</div>
+                            <div>MetaMask</div>
+                        </div>
+                        <p>Connect to:</p>
+                        <p><strong>Example dApp</strong></p>
+                        <p>This site is requesting permission to:</p>
+                        <ul>
+                            <li>View address</li>
+                            <li>Request transactions</li>
+                        </ul>
+                        <button class="button">Connect</button>
+                    </div>
+                    <button class="button" id="nextBtn2">Proceed to Tests</button>
+                </div>
+            </div>
+            
+            <div class="screen" id="screen3">
+                <div class="screen-title">Running Security Tests</div>
+                <div class="screen-content">
+                    <div class="code-block">
+                        <span class="comment">// Testing unlimited approval vulnerability</span><br>
+                        <span class="keyword">const</span> maxUint = <span class="string">'0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'</span>;<br>
+                        <span class="keyword">await</span> page.<span class="function">fill</span>(<span class="string">'#token-approval'</span>, maxUint);<br>
+                        <span class="keyword">await</span> page.<span class="function">click</span>(<span class="string">'#approve-button'</span>);<br><br>
+                        <span class="comment">// Checking for proper warning mechanisms</span><br>
+                        <span class="keyword">const</span> hasWarning = <span class="keyword">await</span> page.<span class="function">isVisible</span>(<span class="string">'.security-warning'</span>);<br>
+                        <span class="function">expect</span>(hasWarning).<span class="function">toBeTruthy</span>(<span class="string">'dApp should display unlimited approval warning'</span>);<br>
+                    </div>
+                    <button class="button" id="nextBtn3">View Results</button>
+                </div>
+            </div>
+            
+            <div class="screen" id="screen4">
+                <div class="screen-title">Security Test Results</div>
+                <div class="screen-content">
+                    <div class="result">
+                        <p><span class="success">✓</span> Wallet connection test passed</p>
+                        <p><span class="warning">⚠</span> <strong>Security Vulnerability Detected:</strong> Unlimited token approvals allowed without clear user warning</p>
+                        <p><span class="error">✖</span> Missing proper handling for maximum approval values</p>
+                    </div>
+                    <div class="code-block">
+                        <span class="comment">// Recommendation</span><br>
+                        <span class="keyword">function</span> <span class="function">improveTokenApproval</span>() {<br>
+                        &nbsp;&nbsp;<span class="comment">// 1. Add explicit warning for unlimited approvals</span><br>
+                        &nbsp;&nbsp;<span class="comment">// 2. Suggest reasonable approval amounts</span><br>
+                        &nbsp;&nbsp;<span class="comment">// 3. Implement secure-by-default limitations</span><br>
+                        }
+                    </div>
+                    <button class="button" id="resetBtn">Restart Demo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="screenshot-ui">
+        <h3 style="margin: 0 0 10px 0; color: white;">GIF Creator</h3>
+        <button id="capture-current">Capture This Screen</button>
+        <div id="screenshots"></div>
+        <button id="download-all" style="margin-top: 20px; background-color: #10B981;">Download All Images</button>
+        <p style="color: white; font-size: 12px; margin: 5px 0;">To create the GIF, combine these screenshots using a tool like ezgif.com</p>
+    </div>
+
+    <script>
+        // For a static image, this is just for reference - 
+        // we'll take screenshots of each step to create a GIF
+        document.getElementById('nextBtn1').addEventListener('click', function() {
+            document.getElementById('screen1').classList.remove('active');
+            document.getElementById('screen2').classList.add('active');
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.add('active');
+        });
+        
+        document.getElementById('nextBtn2').addEventListener('click', function() {
+            document.getElementById('screen2').classList.remove('active');
+            document.getElementById('screen3').classList.add('active');
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step3').classList.add('active');
+        });
+        
+        document.getElementById('nextBtn3').addEventListener('click', function() {
+            document.getElementById('screen3').classList.remove('active');
+            document.getElementById('screen4').classList.add('active');
+            document.getElementById('step3').classList.remove('active');
+            document.getElementById('step4').classList.add('active');
+        });
+        
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            document.getElementById('screen4').classList.remove('active');
+            document.getElementById('screen1').classList.add('active');
+            document.getElementById('step4').classList.remove('active');
+            document.getElementById('step1').classList.add('active');
+        });
+
+        // Screenshot functionality
+        const screenshots = [];
+        
+        document.getElementById('capture-current').addEventListener('click', function() {
+            html2canvas(document.getElementById('demo-container')).then(function(canvas) {
+                const imageData = canvas.toDataURL('image/png');
+                screenshots.push(imageData);
+                
+                // Add to UI
+                const screenshotsContainer = document.getElementById('screenshots');
+                const screenshotItem = document.createElement('div');
+                screenshotItem.className = 'screenshot-item';
+                
+                const screenshotImg = document.createElement('img');
+                screenshotImg.src = imageData;
+                screenshotItem.appendChild(screenshotImg);
+                
+                const screenshotNumber = document.createElement('span');
+                screenshotNumber.textContent = `Step ${screenshots.length}`;
+                screenshotNumber.style.color = 'white';
+                screenshotItem.appendChild(screenshotNumber);
+                
+                const downloadLink = document.createElement('a');
+                downloadLink.textContent = 'Download';
+                downloadLink.className = 'download-link';
+                downloadLink.href = imageData;
+                downloadLink.download = `web3fuzzforge-demo-step-${screenshots.length}.png`;
+                screenshotItem.appendChild(downloadLink);
+                
+                screenshotsContainer.appendChild(screenshotItem);
+            });
+        });
+        
+        document.getElementById('download-all').addEventListener('click', function() {
+            // Create zip for all screenshots
+            screenshots.forEach((screenshot, index) => {
+                const link = document.createElement('a');
+                link.href = screenshot;
+                link.download = `web3fuzzforge-demo-step-${index + 1}.png`;
+                link.click();
+            });
+        });
+    </script>
+</body>
+</html> 

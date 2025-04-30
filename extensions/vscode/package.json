@@ -5,18 +5,12 @@
   "version": "0.2.0",
   "publisher": "web3fuzzforge",
   "engines": {
-    "vscode": "^1.60.0"
+    "vscode": "^1.75.0"
   },
   "categories": [
     "Other",
     "Testing",
     "Snippets"
-  ],
-  "activationEvents": [
-    "onCommand:web3fuzzforge.generateTemplate",
-    "onCommand:web3fuzzforge.oneClickGenerate",
-    "onLanguage:javascript",
-    "onLanguage:typescript"
   ],
   "main": "./extension.js",
   "contributes": {

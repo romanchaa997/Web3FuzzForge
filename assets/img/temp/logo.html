@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web3FuzzForge Logo Generator</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Arial', sans-serif;
+            background-color: #1E293B;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .logo-container {
+            width: 400px;
+            height: 400px;
+            background-color: #19191F;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            border-radius: 8px;
+        }
+        .logo {
+            width: 250px;
+            height: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .shield {
+            width: 200px;
+            height: 240px;
+            position: relative;
+        }
+        .shield-outline {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: transparent;
+            border: 8px solid white;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+        .lightning {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 140px;
+            background-color: transparent;
+        }
+        .lightning svg {
+            width: 100%;
+            height: 100%;
+            fill: white;
+        }
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        button {
+            background: #3778FF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #2967E8;
+        }
+        #save-logo-btn {
+            background: #10B981;
+        }
+        #save-logo-btn:hover {
+            background: #059669;
+        }
+        #status {
+            color: white;
+            margin-top: 10px;
+            text-align: center;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-container" id="logo-container">
+        <div class="logo">
+            <div class="shield">
+                <div class="shield-outline"></div>
+                <div class="lightning">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11 21h-1l1-7h-7l9-14 1 8h7l-10 13z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button id="capture-btn">Capture Logo</button>
+        <button id="save-logo-btn">Save as web3fuzzforge-logo.png</button>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        document.getElementById('capture-btn').addEventListener('click', function() {
+            html2canvas(document.getElementById('logo-container')).then(function(canvas) {
+                // Create a new tab with just the image
+                const imageWindow = window.open();
+                imageWindow.document.write('<img src="' + canvas.toDataURL("image/png") + '" alt="Web3FuzzForge Logo"/>');
+                
+                // Show success message
+                document.getElementById('status').textContent = 'Logo captured! Right-click to save.';
+            });
+        });
+        
+        document.getElementById('save-logo-btn').addEventListener('click', function() {
+            html2canvas(document.getElementById('logo-container')).then(function(canvas) {
+                // Create a download link
+                const link = document.createElement('a');
+                link.download = 'web3fuzzforge-logo.png';
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+                
+                // Show success message
+                document.getElementById('status').textContent = 'Logo saved as web3fuzzforge-logo.png';
+            });
+        });
+    </script>
+</body>
+</html> 

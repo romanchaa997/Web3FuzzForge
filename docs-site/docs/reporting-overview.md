@@ -1,88 +1,132 @@
 ---
-sidebar_position: 1
+id: reporting-overview
+title: Test Result Reporting
+sidebar_label: Reporting
+slug: /reporting-overview
 ---
 
 # Test Result Reporting
 
-Web3FuzzForge provides a structured reporting system to help you analyze test results, particularly security vulnerabilities found during testing.
+Web3FuzzForge provides a comprehensive reporting system to help you analyze test results, identify security vulnerabilities, and track improvements over time.
 
-## Current Reporting System
+## Enhanced Reporting System
 
-The current reporting system includes:
+Our updated reporting system includes:
 
-- Detailed test logs in the `test-results/` directory
-- Visual report generation with Playwright's built-in HTML reporter
-- Basic failure categorization
+- **Structured Test Reports**: JSON and HTML formats with detailed vulnerability information
+- **Vulnerability Categorization**: Based on standardized Web3 security classifications
+- **Severity Ratings**: CVSS-compatible severity scores for each finding
+- **CI/CD Integration**: Seamless integration with popular CI/CD systems
+- **Trend Analysis**: Track security posture improvements over time
 
 ## Accessing Test Reports
 
 After running your tests, you can access reports in several ways:
 
 ```bash
-# Open the HTML report from your last test run
-npx playwright show-report
+# Generate a comprehensive security report
+web3fuzzforge run --report-format=full
 
-# Specify a custom report location
-npx playwright test --reporter=html:./custom-report-path
+# Open the HTML report from your last test run
+web3fuzzforge report open
+
+# Export report to different formats
+web3fuzzforge report export --format=json|csv|pdf
 ```
 
-## Report Structure
+## Vulnerability Categorization
 
-The HTML report includes:
+All security findings are automatically categorized using our standardized Web3 vulnerability classification system:
 
-- Test case summary with pass/fail status
-- Step-by-step execution logs
-- Screenshots of failure points
-- Execution time metrics
-- Environment information
+| Category | Description | Examples |
+|----------|-------------|----------|
+| **W01: Authentication** | Issues with wallet connection and authentication | Insecure signature requests, phishing-vulnerable prompts |
+| **W02: Authorization** | Permission and access control issues | Unlimited token approvals, missing permission checks |
+| **W03: Transaction Integrity** | Problems with transaction construction or validation | Malformed transaction inputs, missing validation |
+| **W04: State Management** | Issues with wallet or dApp state handling | Race conditions, stale state after network switching |
+| **W05: Error Handling** | Improper handling of errors or exceptions | Unhandled promise rejections, silent failures |
+| **W06: User Interface** | Misleading or vulnerable UI elements | Deceptive transaction information, poor security warnings |
+
+## Severity Ratings
+
+Each vulnerability is assigned a severity rating:
+
+- **Critical**: Immediate exploitation risk with severe consequences
+- **High**: Significant security impact with straightforward exploitation
+- **Medium**: Notable security issues requiring specific conditions to exploit
+- **Low**: Minor issues with limited security impact
+- **Informational**: Best practice recommendations
+
+## Integration with CI/CD
+
+Integrate security reporting into your development workflows:
+
+```yaml
+# Example GitHub Actions configuration
+name: Web3 Security Tests
+
+on: [push, pull_request]
+
+jobs:
+  security-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Run security tests
+        run: web3fuzzforge run --ci --report-format=github
+```
 
 ## Customizing Reports
 
-You can customize the reports by:
+You can customize the reports by modifying your `.web3fuzzforge.json` configuration:
 
-1. Modifying your `playwright.config.js` file:
+```json
+{
+  "reporting": {
+    "outputDir": "./security-reports",
+    "formats": ["html", "json", "github"],
+    "categorization": true,
+    "screenshots": true,
+    "evidenceCollection": true,
+    "remediation": true
+  }
+}
+```
+
+## Creating Custom Report Templates
+
+Define your own report templates for organization-specific requirements:
 
 ```javascript
+// custom-template.js
 module.exports = {
-  reporter: [
-    ['html', { outputFolder: 'test-reports' }],
-    ['json', { outputFile: 'results.json' }],
-  ],
-  // ...other configuration
+  name: 'Company Security Template',
+  formatResult: (testResults) => {
+    // Custom formatting logic
+    return {
+      companyId: process.env.COMPANY_ID,
+      projectName: process.env.PROJECT_NAME,
+      timestamp: new Date().toISOString(),
+      results: testResults,
+      summary: generateSummary(testResults)
+    };
+  }
 };
 ```
 
-2. Adding custom metadata to reports:
+## Viewing Report Examples
 
-```javascript
-test('Connection test with custom metadata', async ({ page }, testInfo) => {
-  // Add custom testing metadata
-  testInfo.annotations.push({
-    type: 'wallet',
-    description: 'MetaMask',
-  });
+To see sample reports, run:
 
-  testInfo.annotations.push({
-    type: 'test_category',
-    description: 'security',
-  });
-
-  // Run your test...
-});
+```bash
+web3fuzzforge demo-report
 ```
 
-## Future Improvements
-
-Based on community feedback, we plan to enhance the reporting system with:
-
-1. **Vulnerability Categorization**: Standardized categorization of security issues using OWASP Top 10 for Web3
-2. **Severity Rankings**: Clear indication of the severity level of each vulnerability
-3. **Risk Assessment**: Context-aware risk analysis for each vulnerability
-4. **Recommendations**: Automated suggestions for fixing identified issues
-5. **Export Options**: Additional report formats (PDF, CSV, JSON) for integration with other tools
-6. **Trending Analysis**: Track vulnerability patterns across test runs
-7. **Collaborative Annotations**: Allow teams to comment and collaborate on results
-
-## Contributing to Reporting Improvements
-
-We welcome community contributions to our reporting system. See the [vulnerability-categorization](vulnerability-categorization) page for details on how to help standardize Web3 security vulnerability classifications.
+This will generate example reports demonstrating the various formats and information provided by the reporting system.

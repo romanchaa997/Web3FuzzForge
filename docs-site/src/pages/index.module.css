@@ -4,15 +4,16 @@
  */
 
 .heroBanner {
-  padding: 4rem 0;
+  padding: 2rem 0;
   text-align: center;
   position: relative;
   overflow: hidden;
+  background-color: var(--ifm-color-primary-darkest);
 }
 
 @media screen and (max-width: 996px) {
   .heroBanner {
-    padding: 2rem;
+    padding: 1.5rem;
   }
 }
 
@@ -21,12 +22,166 @@
   align-items: center;
   justify-content: center;
   margin-top: 2rem;
+  gap: var(--ifm-spacing-md);
+  flex-wrap: wrap;
+}
+
+.whatIsSection {
+  padding: 2rem 0;
+  background-color: var(--ifm-background-color);
+  position: relative;
+}
+
+.sectionTitle {
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  text-align: center;
+  font-weight: 700;
+  color: var(--ifm-color-primary);
+}
+
+.whatIsSection .sectionTitle {
+  text-align: left;
+}
+
+.featureList {
+  margin-top: 1.5rem;
+}
+
+.featureItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.checkmark {
+  color: var(--ifm-color-success);
+  margin-right: 0.5rem;
+  font-weight: bold;
+}
+
+.imageContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 1rem;
+}
+
+.heroImage {
+  max-width: 100%;
+  height: auto;
+  max-height: 250px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
 }
 
 .features {
   display: flex;
   align-items: center;
-  padding: 4rem 0;
+  padding: 2rem 0;
   width: 100%;
   background-color: var(--ifm-color-emphasis-100);
+  position: relative;
+}
+
+.featureCard {
+  height: 100%;
+  padding: 1.5rem;
+  border-radius: var(--ifm-card-border-radius);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+  background-color: var(--ifm-card-background-color);
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  border-left: 3px solid var(--ifm-color-primary);
+}
+
+.featureCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.featureIcon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  display: inline-block;
+}
+
+.featureCardList {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 1rem;
+  margin-bottom: 0;
+  flex-grow: 1;
+}
+
+.featureCardList li {
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.featureCardList li:before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--ifm-color-primary);
+}
+
+.quickStartSection {
+  padding: 2rem 0;
+  background-color: var(--ifm-background-color);
+}
+
+.codeBlock {
+  margin-bottom: 1.5rem;
+  border-radius: var(--ifm-code-border-radius);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.codeHeader {
+  background-color: var(--ifm-color-emphasis-200);
+  padding: 0.75rem 1rem;
+  font-weight: bold;
+  border-bottom: 1px solid var(--ifm-color-emphasis-300);
+}
+
+.codeContent {
+  padding: 1rem;
+  margin-bottom: 0;
+  background-color: var(--ifm-pre-background);
+}
+
+.ctaContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+@media screen and (max-width: 768px) {
+  .ctaContainer {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .ctaContainer .button {
+    margin: 0.5rem 0;
+  }
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 996px) {
+  .whatIsSection .col--7,
+  .whatIsSection .col--5 {
+    width: 100%;
+    max-width: 100%;
+    flex-basis: 100%;
+  }
+  
+  .heroImage {
+    max-height: 180px;
+  }
 } 

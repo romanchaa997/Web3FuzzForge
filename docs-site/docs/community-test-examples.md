@@ -1,107 +1,306 @@
 ---
-sidebar_position: 2
+id: community-test-examples
+title: Community Test Examples
+sidebar_label: Community Examples
+slug: /community-test-examples
 ---
 
 # Community Test Examples
 
-This section showcases community-contributed test examples for Web3 security testing. These examples provide real-world patterns for testing common Web3 vulnerability scenarios.
+This section showcases real-world test examples contributed by the Web3FuzzForge community. These examples demonstrate how to test for common vulnerabilities and edge cases in Web3 applications.
 
-## Contributing a Test Example
+## Security Test Examples
 
-We welcome contributions from the community. To contribute your own test example:
+### Detecting Unlimited Token Approvals
 
-1. Fork the repository
-2. Add your example to the appropriate directory in `web3fuzzforge-community-tests/`
-3. Include detailed documentation explaining the security concept being tested
-4. Submit a pull request with your example
-
-## Available Examples
-
-### Wallet Connection Tests
-
-| Name                             | Description                                              | Author          | Link                                                                                                                                                                      |
-| -------------------------------- | -------------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Wallet Connection Hijacking Test | Tests for prevention of malicious connection requests    | @web3-tester    | [View Example](https://github.com/web3fuzzforge/web3-security-test-kit/blob/main/web3fuzzforge-community-tests/dapp-tests/wallet-connection/connection-hijacking-test.js) |
-| Multi-Wallet Support Test        | Tests dApp compatibility with different wallet providers | @chain-defender | [View Example](https://github.com/web3fuzzforge/web3-security-test-kit/blob/main/web3fuzzforge-community-tests/dapp-tests/wallet-connection/multi-wallet-test.js)         |
-
-### Transaction Flow Tests
-
-| Name                               | Description                                             | Author         | Link                                                                                                                                                                 |
-| ---------------------------------- | ------------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Transaction Parameter Manipulation | Tests for prevention of transaction parameter tampering | @smart-audit   | [View Example](https://github.com/web3fuzzforge/web3-security-test-kit/blob/main/web3fuzzforge-community-tests/dapp-tests/transaction-flow/tx-parameter-test.js)     |
-| Gas Optimization Test              | Tests for reasonable gas limits and price suggestions   | @gas-optimizer | [View Example](https://github.com/web3fuzzforge/web3-security-test-kit/blob/main/web3fuzzforge-community-tests/dapp-tests/transaction-flow/gas-optimization-test.js) |
-
-## Example Details
-
-### Wallet Connection Hijacking Test
-
-This example tests for proper origin verification in wallet connection flows. It simulates:
-
-1. A legitimate connection request
-2. A spoofed connection request from an unexpected origin
-3. Verification that the dApp properly validates connection origins
-
-The test looks for:
-
-- Origin verification in connection requests
-- Proper error handling for invalid connection attempts
-- Clear user notifications about connection security
+This test identifies dApps that request unlimited token approvals, a common security risk:
 
 ```javascript
-// Simplified example
-test('wallet connection origin verification', async ({ page }) => {
-  // Set up legitimate connection
-  await page.goto('https://legitimate-dapp.com');
-  await page.click('#connect-wallet');
-
-  // Verify connection success
-  await page.waitForSelector('[data-testid="connected-status"]');
-
-  // Set up spoofed connection from unexpected origin
-  const spoofedPage = await context.newPage();
-  await spoofedPage.goto('https://legitimate-dapp.com');
-
-  // Attempt to inject malicious origin
-  await spoofedPage.evaluate(() => {
-    // Attempt to spoof origin in connection request
-    window.ethereum.request({
-      method: 'eth_requestAccounts',
-      params: [{ origin: 'https://legitimate-dapp.com' }],
-    });
-  });
-
-  // Check for proper error handling
-  const errorVisible = await spoofedPage.isVisible('[data-testid="connection-error"]');
-  expect(errorVisible).toBeTruthy();
+test('should detect unlimited token approvals', async ({ page }) => {
+  // Setup wallet and connect to dApp
+  await connectWallet(page);
+  
+  // Navigate to token approval section
+  await page.goto('https://your-dapp.com/swap');
+  
+  // Initiate a token approval transaction
+  await page.click('#approve-token');
+  
+  // Check approval transaction details
+  const transactionDetails = await getWalletTransactionDetails(page);
+  
+  // Check if approval amount equals max uint256 (unlimited approval)
+  const isUnlimitedApproval = transactionDetails.data.includes('ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
+  
+  // Log finding if unlimited approval detected
+  if (isUnlimitedApproval) {
+    console.log('SECURITY RISK: Unlimited token approval detected');
+    
+    // Take screenshot as evidence
+    await page.screenshot({ path: 'unlimited-approval-evidence.png' });
+  }
+  
+  // Assert against unlimited approvals
+  expect(isUnlimitedApproval).toBeFalsy();
 });
 ```
 
-## Requesting New Examples
+### Testing for Front-Running Vulnerability
 
-If you need examples for specific security scenarios, please open an issue on our GitHub repository with:
+This test checks if a dApp is vulnerable to front-running attacks:
 
-1. A description of the security scenario
-2. The specific vulnerability or pattern you want to test
-3. Any reference materials or existing exploits
-4. (Optional) A sketch of the test approach you're considering
+```javascript
+test('should check for front-running vulnerability', async ({ page }) => {
+  // Setup wallet with test funds
+  await setupWalletState(page, {
+    balance: '10000000000000000000' // 10 ETH
+  });
+  
+  // Connect to DEX or trading dApp
+  await page.goto('https://your-dex.com');
+  await connectWallet(page);
+  
+  // Fill trade form with large trade that would impact price
+  await page.fill('#trade-amount', '5'); // 5 ETH
+  await page.selectOption('#token-to-buy', 'TOKEN');
+  
+  // Check if there's a warning about slippage or front-running
+  const hasFrontRunningProtection = await page.isVisible('#slippage-warning');
+  const hasTimeLimit = await page.isVisible('[data-testid="transaction-deadline"]');
+  
+  // Capture evidence
+  if (!hasFrontRunningProtection || !hasTimeLimit) {
+    await page.screenshot({ path: 'front-running-vulnerability.png' });
+  }
+  
+  // Log findings
+  if (!hasFrontRunningProtection) {
+    console.log('SECURITY RISK: No front-running protection detected');
+  }
+  
+  if (!hasTimeLimit) {
+    console.log('SECURITY RISK: No transaction time limit protection detected');
+  }
+  
+  // Assert proper protections are in place
+  expect(hasFrontRunningProtection).toBeTruthy();
+  expect(hasTimeLimit).toBeTruthy();
+});
+```
 
-## Future Plans
+### Detecting Race Conditions in Network Switching
 
-We're working to expand our community test examples with:
+This test identifies potential race conditions when switching networks:
 
-1. More DeFi-specific vulnerability tests
-2. NFT marketplace security tests
-3. Cross-chain security tests
-4. Token bridge vulnerability tests
-5. Mobile wallet security tests
+```javascript
+test('should detect network switching race conditions', async ({ page }) => {
+  // Setup wallet
+  await setupWalletState(page);
+  
+  // Navigate to dApp
+  await page.goto('https://your-dapp.com');
+  await connectWallet(page);
+  
+  // Initiate rapid network switches
+  const switchPromises = [];
+  const networks = ['0x1', '0x89', '0x1', '0x89']; // ETH, Polygon, ETH, Polygon
+  
+  for (const chainId of networks) {
+    switchPromises.push(
+      page.evaluate(id => {
+        return window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: id }]
+        });
+      }, chainId)
+    );
+  }
+  
+  // Execute all network switches in parallel
+  await Promise.all(switchPromises);
+  
+  // Check if dApp state is corrupted
+  const isAppStateConsistent = await page.evaluate(() => {
+    // Check if UI correctly shows current network
+    const networkDisplay = document.querySelector('#network-display');
+    const currentChainId = window.ethereum.chainId;
+    
+    return networkDisplay && networkDisplay.textContent.includes(currentChainId);
+  });
+  
+  // Take evidence
+  if (!isAppStateConsistent) {
+    await page.screenshot({ path: 'network-race-condition.png' });
+    console.log('SECURITY RISK: Network switching race condition detected');
+  }
+  
+  expect(isAppStateConsistent).toBeTruthy();
+});
+```
 
-## Guidelines for Example Quality
+## Transaction Test Examples
 
-When contributing examples, please ensure they:
+### Testing Transaction with Malformed Data
 
-1. Focus on a specific, well-defined security concern
-2. Include clear documentation about what's being tested and why
-3. Use realistic but safe testing approaches
-4. Follow best practices for test structure and readability
-5. Include appropriate assertions and verifications
-6. Avoid using real assets or mainnet in test examples
+This test verifies how your dApp handles transactions with malformed data:
+
+```javascript
+test('should handle transaction with malformed data', async ({ page }) => {
+  // Setup and connect wallet
+  await setupWalletState(page);
+  await page.goto('https://your-dapp.com/send');
+  await connectWallet(page);
+  
+  // Attempt to inject malformed data into transaction
+  await page.evaluate(() => {
+    // Override the transaction sending function
+    const originalSendTransaction = window.ethereum.request;
+    window.ethereum.request = async (args) => {
+      if (args.method === 'eth_sendTransaction') {
+        // Inject malformed data 
+        args.params[0].data = '0xinvaliddata';
+      }
+      return originalSendTransaction.call(window.ethereum, args);
+    };
+  });
+  
+  // Initiate transaction
+  await page.fill('#recipient', '0x1234567890123456789012345678901234567890');
+  await page.fill('#amount', '0.001');
+  await page.click('#send-button');
+  
+  // Check for proper error handling
+  const errorShown = await page.isVisible('#error-message');
+  
+  if (!errorShown) {
+    console.log('SECURITY RISK: No error handling for malformed transaction data');
+    await page.screenshot({ path: 'malformed-data-no-error.png' });
+  }
+  
+  expect(errorShown).toBeTruthy();
+});
+```
+
+### Testing Extreme Gas Prices
+
+This test checks how a dApp handles extremely high gas prices:
+
+```javascript
+test('should handle transaction with extremely high gas price', async ({ page }) => {
+  // Setup wallet
+  await setupWalletState(page);
+  
+  // Connect to dApp
+  await page.goto('https://your-dapp.com');
+  await connectWallet(page);
+  
+  // Override the gas price to an extremely high value
+  await page.evaluate(() => {
+    const originalSendTransaction = window.ethereum.request;
+    window.ethereum.request = async (args) => {
+      if (args.method === 'eth_sendTransaction') {
+        // Set an extremely high gas price
+        args.params[0].gasPrice = '0x1000000000000000'; // Extremely high
+      }
+      return originalSendTransaction.call(window.ethereum, args);
+    };
+  });
+  
+  // Initiate a transaction
+  await page.click('#transaction-button');
+  
+  // Check if dApp warns about high gas price
+  const highGasWarning = await page.isVisible('#high-gas-warning');
+  
+  if (!highGasWarning) {
+    console.log('SECURITY RISK: No warning for extremely high gas price');
+    await page.screenshot({ path: 'high-gas-no-warning.png' });
+  }
+  
+  expect(highGasWarning).toBeTruthy();
+});
+```
+
+## Wallet Interaction Examples
+
+### Detecting Phishing Attempts
+
+This test verifies if a dApp requests sensitive wallet operations without proper context:
+
+```javascript
+test('should detect potential phishing attempts', async ({ page }) => {
+  // Setup wallet with valuable assets
+  await setupWalletState(page, {
+    nfts: [{ tokenId: '1', address: '0xnft...' }],
+    tokens: [{ symbol: 'USDC', balance: '1000000000' }]
+  });
+  
+  // Navigate to dApp
+  await page.goto('https://your-dapp.com');
+  await connectWallet(page);
+  
+  // Monitor for personal_sign or eth_sign without proper context
+  let phishingAttemptDetected = false;
+  await page.evaluate(() => {
+    window.potentialPhishingAttempts = [];
+    const originalRequest = window.ethereum.request;
+    
+    window.ethereum.request = async (args) => {
+      // Check for potentially dangerous signing methods
+      if (args.method === 'personal_sign' || args.method === 'eth_sign') {
+        window.potentialPhishingAttempts.push({
+          method: args.method,
+          params: args.params,
+          url: window.location.href,
+          timestamp: Date.now()
+        });
+      }
+      return originalRequest.call(window.ethereum, args);
+    };
+  });
+  
+  // Interact with the dApp normally
+  await page.click('#start-button');
+  await page.waitForTimeout(5000); // Allow time for dApp to operate
+  
+  // Check if any potential phishing attempts occurred
+  phishingAttemptDetected = await page.evaluate(() => {
+    return window.potentialPhishingAttempts.length > 0;
+  });
+  
+  if (phishingAttemptDetected) {
+    const phishingData = await page.evaluate(() => window.potentialPhishingAttempts);
+    console.log('SECURITY RISK: Potential phishing attempt detected', phishingData);
+    await page.screenshot({ path: 'potential-phishing.png' });
+  }
+  
+  expect(phishingAttemptDetected).toBeFalsy();
+});
+```
+
+## Contributing Your Own Examples
+
+We welcome community contributions to our test examples! To submit your own:
+
+1. Fork the Web3FuzzForge repository
+2. Add your test to the `web3fuzzforge-community-tests` directory
+3. Include detailed documentation on what vulnerability it detects
+4. Submit a pull request
+
+You can also share your test examples in our community channels.
+
+## Run Community Examples
+
+To run the community examples directly:
+
+```bash
+# Clone the community tests repo
+git clone https://github.com/web3fuzzforge/web3fuzzforge-community-tests.git
+
+# Install dependencies
+cd web3fuzzforge-community-tests
+npm install
+
+# Run a specific test category
+npx web3fuzzforge run --test-dir=dapp-tests/transaction-flow
+```

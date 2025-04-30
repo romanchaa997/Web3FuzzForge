@@ -1,0 +1,22 @@
+[build]
+  publish = "."
+  command = "# no build command needed for static site"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Optimize asset caching
+[[headers]]
+  for = "/assets/**"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Handle form submissions
+[functions]
+  directory = "netlify/functions"
+
+# Redirect rules
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200 

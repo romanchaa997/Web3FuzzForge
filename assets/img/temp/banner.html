@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web3FuzzForge Banner</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #1E293B;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .banner {
+            width: 1200px;
+            height: 400px;
+            background: linear-gradient(135deg, #2E3A59 0%, #1E293B 100%);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+        .content {
+            padding: 50px;
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 2;
+        }
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .shield {
+            color: #60A5FA;
+            font-size: 38px;
+            margin-right: 15px;
+        }
+        .tagline {
+            font-size: 42px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 25px;
+            line-height: 1.2;
+        }
+        .description {
+            font-size: 20px;
+            color: #CBD5E1;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+        .graphics {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .code-window {
+            position: absolute;
+            top: 50%;
+            right: 30px;
+            transform: translateY(-50%);
+            width: 450px;
+            height: 280px;
+            background-color: #1A1F2E;
+            border-radius: 8px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        .code-header {
+            height: 30px;
+            background-color: #2D3748;
+            display: flex;
+            padding: 0 10px;
+            align-items: center;
+        }
+        .code-dots {
+            display: flex;
+            gap: 5px;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .dot.red { background-color: #FC8181; }
+        .dot.yellow { background-color: #F6E05E; }
+        .dot.green { background-color: #68D391; }
+        .code-title {
+            margin-left: 15px;
+            color: #CBD5E1;
+            font-size: 12px;
+        }
+        .code-content {
+            padding: 15px;
+            color: #CBD5E1;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .keyword { color: #F687B3; }
+        .function { color: #63B3ED; }
+        .string { color: #68D391; }
+        .comment { color: #718096; }
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.2;
+        }
+        .highlight {
+            color: #60A5FA;
+        }
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: #60A5FA;
+            border-radius: 50%;
+            opacity: 0.2;
+        }
+        /* Generate random particles */
+        .particle:nth-child(1) { top: 10%; left: 20%; }
+        .particle:nth-child(2) { top: 25%; left: 40%; }
+        .particle:nth-child(3) { top: 45%; left: 15%; }
+        .particle:nth-child(4) { top: 65%; left: 35%; }
+        .particle:nth-child(5) { top: 80%; left: 25%; }
+        .particle:nth-child(6) { top: 15%; left: 55%; }
+        .particle:nth-child(7) { top: 35%; left: 75%; }
+        .particle:nth-child(8) { top: 60%; left: 65%; }
+        .particle:nth-child(9) { top: 75%; left: 85%; }
+        .particle:nth-child(10) { top: 90%; left: 50%; }
+        #capture-ui {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+        button {
+            background: #60A5FA;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #3B82F6;
+        }
+        #download-info {
+            color: white;
+            font-size: 14px;
+            display: none;
+        }
+        #save-banner-btn {
+            background: #10B981;
+            margin-top: 10px;
+        }
+        #save-banner-btn:hover {
+            background: #059669;
+        }
+    </style>
+</head>
+<body>
+    <div class="banner" id="banner">
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+        <div class="content">
+            <div class="logo">
+                <span class="shield">🛡️</span> 
+                Web3FuzzForge
+            </div>
+            <div class="tagline">
+                Secure your dApps with <span class="highlight">Automated</span> Fuzzing
+            </div>
+            <div class="description">
+                Test wallet connections, transactions, and detect security vulnerabilities with our comprehensive Web3 security toolkit.
+            </div>
+        </div>
+        <div class="graphics">
+            <div class="code-window">
+                <div class="code-header">
+                    <div class="code-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="code-title">security-test.js</div>
+                </div>
+                <div class="code-content">
+                    <pre><span class="comment">// Security fuzzing test</span>
+<span class="keyword">const</span> { test } = <span class="function">require</span>(<span class="string">'@playwright/test'</span>);
+<span class="keyword">const</span> { wallet } = <span class="function">require</span>(<span class="string">'../utils'</span>);
+
+test(<span class="string">'Detect unlimited approvals'</span>, <span class="keyword">async</span> ({ page }) => {
+  <span class="keyword">await</span> wallet.<span class="function">connect</span>();
+  
+  <span class="comment">// Test max uint approval</span>
+  <span class="keyword">const</span> maxUint = <span class="string">'0xffffffff...'</span>;
+  <span class="keyword">await</span> <span class="function">checkApproval</span>(maxUint);
+  
+  <span class="comment">// Verify security warning</span>
+  <span class="keyword">await</span> <span class="function">expect</span>(page).
+    <span class="function">toHaveWarning</span>(<span class="string">'unlimited'</span>);
+});</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="capture-ui">
+        <button id="capture-btn">Capture Banner</button>
+        <button id="save-banner-btn">Save as web3fuzzforge-banner.png</button>
+        <div id="download-info">Right-click the image to save it</div>
+    </div>
+
+    <script>
+        document.getElementById('capture-btn').addEventListener('click', function() {
+            html2canvas(document.getElementById('banner')).then(function(canvas) {
+                // Create a new tab with just the image
+                const imageWindow = window.open();
+                imageWindow.document.write('<img src="' + canvas.toDataURL("image/png") + '" alt="Web3FuzzForge Banner"/>');
+                
+                // Show download info
+                document.getElementById('download-info').style.display = 'block';
+            });
+        });
+        
+        document.getElementById('save-banner-btn').addEventListener('click', function() {
+            html2canvas(document.getElementById('banner')).then(function(canvas) {
+                // Create a download link
+                const link = document.createElement('a');
+                link.download = 'web3fuzzforge-banner.png';
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+                
+                // Show success message
+                document.getElementById('download-info').style.display = 'block';
+                document.getElementById('download-info').textContent = 'Banner saved as web3fuzzforge-banner.png';
+            });
+        });
+    </script>
+</body>
+</html> 

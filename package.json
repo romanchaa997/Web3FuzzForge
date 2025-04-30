@@ -35,6 +35,8 @@
     "eslint-plugin-promise": "6.1.1",
     "eslint-plugin-react": "7.33.2",
     "globals": "14.0.0",
+    "imagemin-cli": "^8.0.0",
+    "imagemin-webp": "^8.0.0",
     "prettier": "3.2.5",
     "typescript": "5.3.3"
   },
@@ -79,7 +81,23 @@
     "security:run-test:wrapper": "npx playwright test tests/sample-metamask-connect.test.js --headed",
     "security:report": "node -e \"require('./utils/security-report-generator').generateReport()\"",
     "security:full-scan": "npm run security:scan && npm run security:report",
-    "test:wallet-interactions": "npx playwright test tests/wallet-interactions/ --headed"
+    "test:wallet-interactions": "npx playwright test tests/wallet-interactions/ --headed",
+    
+    "docs": "cd docs-site && npm run start",
+    "docs:build": "cd docs-site && npm run build",
+    "docs:deploy": "cd docs-site && npm run deploy",
+    "docs:serve": "cd docs-site && npm run serve",
+    
+    "report:generate": "node src/utils/generate-report.js",
+    "report:categorize": "node src/utils/categorize-vulnerabilities.js",
+    "report:export": "node src/utils/export-report.js --format=json,html,pdf",
+    "report:summary": "node src/utils/generate-report-summary.js",
+    
+    "mobile:setup": "node src/utils/setup-mobile-testing.js",
+    "mobile:test": "npx playwright test tests/mobile/ --headed",
+    
+    "cross-chain:test": "npx playwright test tests/cross-chain/ --headed",
+    "cross-chain:setup": "node src/utils/setup-cross-chain-testing.js"
   },
   "engines": {
     "node": ">=16.0.0 <19.0.0",

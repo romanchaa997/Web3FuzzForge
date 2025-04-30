@@ -72,7 +72,12 @@ module.exports = {
           dropdownActiveClassDisabled: true,
         },
         {
-          href: 'https://github.com/web3fuzzforge/web3-security-test-kit',
+          href: 'https://gitlab.com/romanchaa997/web3-security-test-kit',
+          label: 'GitLab',
+          position: 'right',
+        },
+        {
+          href: 'https://github.com/romanchaa997/Web3FuzzForge',
           label: 'GitHub',
           position: 'right',
         },
@@ -111,8 +116,12 @@ module.exports = {
           title: 'More',
           items: [
             {
+              label: 'GitLab',
+              href: 'https://gitlab.com/romanchaa997/web3-security-test-kit',
+            },
+            {
               label: 'GitHub',
-              href: 'https://github.com/web3fuzzforge/web3-security-test-kit',
+              href: 'https://github.com/romanchaa997/Web3FuzzForge',
             },
           ],
         },

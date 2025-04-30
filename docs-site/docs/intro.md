@@ -1,34 +1,49 @@
 ---
-sidebar_position: 1
+id: intro
+title: Introduction to Web3FuzzForge
+sidebar_label: Introduction
+slug: /intro
 ---
 
-# Introduction to Web3FuzzForge
+# Web3FuzzForge 🛡️
 
-Web3FuzzForge is an automated test scaffolding tool for battle-tested Web3 developers who need efficient security testing solutions.
+Secure your Web3 dApps with automated fuzzing and transaction testing.
 
-## Why This Tool Exists
+## 🚀 What is Web3FuzzForge?
+Web3FuzzForge is a security-first test kit for Web3 applications.
+It helps you:
 
-Every decent web3 project has smart contract tests. Few have UI tests. That's a security nightmare.
+- Simulate wallet connections and transactions
+- Auto-generate fuzzing scenarios
+- Quickly catch UI and interaction failures
+- Detect security vulnerabilities
 
-This tool generates test templates that automate the previously unautomatable:
+⚡ Built for fast prototyping, robust testing, and maximum dApp resilience.
 
-- MetaMask interactions
-- Wallet connections
-- Transaction signing
-- Network switching
+## 🔥 Features
+- **Multi-Wallet Support**: Test with MetaMask, WalletConnect, Coinbase, Phantom, and more
+- **Security Test Generation**: Built-in fuzzing support and vulnerability detection
+- **Wallet Snapshots**: Save and restore wallet states for complex test scenarios
+- **Mock dApp Support**: Develop and run against a simulated environment
+- **Playwright Integration**: Built on the powerful Playwright testing framework
 
-All through programmable interfaces that make testing Web3 applications significantly easier.
+## 📚 Documentation Overview
 
-## Key Features
+Our documentation is organized into the following sections:
 
-- **Multi-Wallet Support**: Test with MetaMask, WalletConnect, Coinbase Wallet, Phantom, and more.
-- **Type Generation**: JavaScript and TypeScript support for all templates.
-- **Preset Configurations**: Pre-configured settings for ERC20/721, DeFi, DAO applications.
-- **AI-Driven Configuration**: Generate configs using natural language prompts.
-- **Wallet State Snapshots**: Save and restore wallet states for complex test scenarios.
-- **Security Test Templates**: Pre-built templates for common security test patterns.
-- **Performance Benchmarking**: Track and optimize test performance.
+- [Installation Guide](/docs/installation) - Get started with Web3FuzzForge
+- [Quickstart Tutorial](/docs/quickstart) - Create your first tests
+- [Security Testing](/docs/security-testing) - Learn about the security testing capabilities
+- [Wallet Integration](/docs/real-wallet-integration) - Connect with real wallets
+- [Mobile Testing](/docs/mobile-wallets) - Test mobile wallet interactions
+- [Cross-Chain Testing](/docs/cross-chain-testing) - Test dApps across multiple chains
+- [Vulnerability Categorization](/docs/vulnerability-categorization) - Understand vulnerability types
+- [Reporting](/docs/reporting-overview) - Generate and interpret test reports
 
-## What's Next?
+## 🧪 Community Examples
 
-Check out the [Installation](installation) guide to get started, or jump straight to the [Quickstart](quickstart) if you're ready to dive in.
+Check out our [community test examples](/docs/community-test-examples) to see how others are using Web3FuzzForge to secure their dApps.
+
+## 🤝 Get Involved
+
+We welcome contributions from the community! Visit our [GitHub repository](https://github.com/romanchaa997/Web3FuzzForge) to get involved.

@@ -13,6 +13,8 @@ tags: [web3, security, release, announcement]
 
 We're excited to announce the official release of Web3FuzzForge 1.0, our comprehensive security testing framework for Web3 applications!
 
+<!--truncate-->
+
 ## What's Included
 
 - **Automated Test Generation**: Quickly scaffold tests for your dApps
